@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public class DragController : MonoBehaviour
+public static class DragController
 {
-    private Container _targetContainer;
+    private static Container _targetContainer;
     
-    public void ContainerClick(Container container)
+    public static void ContainerClick(Container container)
     {
         if (container == null)
             return;
@@ -21,7 +21,7 @@ public class DragController : MonoBehaviour
         }
     }
 
-    public void PlaceClick(IPlaceable placeable)
+    public static void PlaceClick(IPlaceable placeable)
     {
         if (_targetContainer == null)
             return;

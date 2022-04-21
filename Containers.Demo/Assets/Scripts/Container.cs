@@ -2,18 +2,21 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Containers.Core;
+using Random = UnityEngine.Random;
 
 public class Container : MonoBehaviour
 {
+    private static int NextId = 1;
+    
     [SerializeField] private Color _defaultColor;
     [SerializeField] private Color _enterColor;
     [SerializeField] private Color _selectedColor;
-    
-    [SerializeField] DragController _dragController;
 
     private Material _material;
     private Color _currentStateColor;
     private bool _isSelected;
+
+    public ContainerData Data { get; } = new() {Id = NextId++, Type = ContainerType.Large};
 
     private void Awake()
     {
@@ -25,7 +28,7 @@ public class Container : MonoBehaviour
 
     private void OnMouseUpAsButton()
     {
-        _dragController.ContainerClick(this);
+        DragController.ContainerClick(this);
     }
 
     private void OnMouseEnter()

@@ -2,9 +2,10 @@ using UnityEngine;
 
 public class Platform : MonoBehaviour, IPlaceable
 {
-    [SerializeField] private DragController _dragController;
-
     private Transform _transform;
+    
+    public int IndexInHolder { get; set; }
+    public PlatformHolder Holder { get; set; }
 
     private void Start()
     {
@@ -13,16 +14,22 @@ public class Platform : MonoBehaviour, IPlaceable
 
     private void OnMouseUpAsButton()
     {
-        _dragController.PlaceClick(this);
+        DragController.PlaceClick(this);
     }
 
     public void Place(Container container)
     {
-        var containerTransform = container.GetComponent<Transform>();
+        Holder.Place(container, this);
         
+        var containerTransform = container.GetComponent<Transform>();
         containerTransform.SetParent(_transform);
 
+        var placement = Holder.Placeholder.Placements[IndexInHolder];
+
+        var localScale = containerTransform.localScale;
+        var t = 2 * (placement.Count - 1) * localScale.y;
         containerTransform.localPosition =
-            Vector3.up * (containerTransform.localScale.y / 2 + _transform.localScale.y / 2);
+            Vector3.up * ((t + localScale.y) / 2 +
+                          _transform.localScale.y / 2);
     }
 }

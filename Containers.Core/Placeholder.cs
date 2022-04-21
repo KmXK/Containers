@@ -25,7 +25,7 @@ namespace Containers.Core
         {
             _maxHeight = maxHeight;
             _maxCountOfContainerPlaces = maxCountOfContainerPlaces;
-            _placements = new ContainerPlace[_maxCountOfContainerPlaces];
+            _placements = new ContainerPlace[maxCountOfContainerPlaces];
         }
 
         public void Place(ContainerData containerData, int containerPlaceIndex)
