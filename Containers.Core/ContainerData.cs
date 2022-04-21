@@ -1,6 +1,6 @@
 ﻿namespace Containers.Core;
 
-public class Container
+public class ContainerData
 {
     public ContainerType Type { get; set; }
     public int Id { get; set; }

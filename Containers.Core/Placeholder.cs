@@ -10,13 +10,14 @@ namespace Containers.Core
     public class Placeholder
     {
         private readonly int _maxHeight;
-        private int _maxCountOfContainerPlaces;
         private readonly ContainerPlace[] _placements;
 
-        private List<ContainerColumn> _largeContainerColumns = new List<ContainerColumn>();
-        private List<ContainerColumn> _smallContainerColumns = new List<ContainerColumn>();
-        private readonly Dictionary<int, Container> _dict = new Dictionary<int, Container>();
+        private readonly List<ContainerColumn> _largeContainerColumns = new List<ContainerColumn>();
+        private readonly List<ContainerColumn> _smallContainerColumns = new List<ContainerColumn>();
+        private readonly Dictionary<int, ContainerData> _dict = new Dictionary<int, ContainerData>();
 
+        private int _maxCountOfContainerPlaces;
+        
         public int CountOfContainerPlaces { get; private set; }
         public ContainerPlace[] Placements => (ContainerPlace[]) _placements.Clone();
 
@@ -27,11 +28,11 @@ namespace Containers.Core
             _placements = new ContainerPlace[_maxCountOfContainerPlaces];
         }
 
-        public void Place(Container container, int containerPlaceIndex)
+        public void Place(ContainerData containerData, int containerPlaceIndex)
         {
             if (_placements[containerPlaceIndex] == null)
             {
-                switch (container.Type)
+                switch (containerData.Type)
                 {
                     case ContainerType.Large:
                         CreatePlaceForLargeContainer(containerPlaceIndex);
@@ -46,27 +47,27 @@ namespace Containers.Core
                 CountOfContainerPlaces++;
             }
             
-            _placements[containerPlaceIndex].Place(container);
+            _placements[containerPlaceIndex].Place(containerData);
             
-            _dict[container.Id] = container;
+            _dict[containerData.Id] = containerData;
         }
 
-        public Container Find(int id)
+        public ContainerData Find(int id)
         {
             return _dict[id];
         }
 
-        public Container Remove(Container container)
+        public ContainerData Remove(ContainerData containerData)
         {
-            var column = container.Column;
+            var column = containerData.Column;
             var place = column.ContainerPlace;
 
-            column.Take(container);
+            column.Take(containerData);
 
             if (place.Count == 0)
                 _placements[place.IndexInPlaceholder] = null;
 
-            return container;
+            return containerData;
         }
 
         private void CreatePlaceForSmallContainer(int containerPlaceIndex)

@@ -28,11 +28,11 @@ foreach (var place in placeholder.Placements)
     Console.WriteLine();
 }
 
-IEnumerable<Container> GetContainer(int count)
+IEnumerable<ContainerData> GetContainer(int count)
 {
     for (var i = 0; i < count; i++)
     {
-        yield return new Container()
+        yield return new ContainerData()
         {
             Id = random.Next(),
             Company = alphabet[random.Next() % alphabet.Length].ToString(),

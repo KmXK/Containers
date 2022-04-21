@@ -17,12 +17,12 @@ namespace Containers.Core
             _secondColumn = secondColumn;
         }
 
-        public override void Place(Container container)
+        public override void Place(ContainerData containerData)
         {
-            if (container.Type == ContainerType.Large)
+            if (containerData.Type == ContainerType.Large)
                 throw new ArgumentException("Typecast");
 
-            (_firstColumn.Height <= _secondColumn.Height ? _firstColumn : _secondColumn).Place(container);
+            (_firstColumn.Height <= _secondColumn.Height ? _firstColumn : _secondColumn).Place(containerData);
         }
 
         public override int Count => _firstColumn.Height + _secondColumn.Height;

@@ -1,9 +1,11 @@
-﻿namespace Containers.Core;
+﻿using System.Collections;
 
-public class ContainerColumn
+namespace Containers.Core;
+
+public class ContainerColumn : IEnumerable<ContainerData>
 {
     private readonly int _maxHeight;
-    private readonly Stack<Container> _containers;
+    private readonly Stack<ContainerData> _containers;
 
     public int Height => _containers.Count;
     public ContainerPlace ContainerPlace { get; private set; }
@@ -11,69 +13,43 @@ public class ContainerColumn
     public ContainerColumn(int maxHeight)
     {
         _maxHeight = maxHeight;
-        _containers = new Stack<Container>(maxHeight);
+        _containers = new Stack<ContainerData>(maxHeight);
     }
 
-    public void Place(Container container)
+    public void Place(ContainerData containerData)
     {
         if (Height == _maxHeight)
             throw new ArgumentOutOfRangeException("PlacesCount");
 
-        _containers.Push(container);
+        _containers.Push(containerData);
     }
 
-    public Container Take(Container container)
+    public ContainerData Take(ContainerData containerData)
     {
         if (Height <= 0)
             throw new ArgumentOutOfRangeException("PlacesCount");
 
-        if (Peek() != container)
+        if (Peek() != containerData)
             throw new InvalidOperationException();
 
         return _containers.Pop();
     }
 
-    public Container Peek()
+    public ContainerData Peek()
     {
         if (Height <= 0)
             throw new ArgumentOutOfRangeException("PlacesCount");
 
         return _containers.Peek();
     }
-
-    public Container[] Containers => _containers.ToArray();
-
-    //private readonly int _maxHeight;
-    //private readonly Stack<Container> _containers;
-    //public int Count => _containers.Count;
-
-    //public ContainerColumn(int maxHeight)
-    //{
-    //    _maxHeight = maxHeight;
-    //    _containers = new Stack<Container>(maxHeight);
-
-    //}
     
-    //public void Place(Container container)
-    //{
-    //    if (!_containers.Any())
-    //        _containerType = container.Type;
+    public IEnumerator<ContainerData> GetEnumerator()
+    {
+        return _containers.GetEnumerator();
+    }
 
-    //    if (container.Type != _containerType)
-    //        throw new InvalidOperationException("Foo");
-
-    //    if (Height == _maxHeight)
-    //        throw new ArgumentOutOfRangeException("PlacesCount");
-
-    //    _containers.Push(container);
-    //    container.Column = this;
-    //}
-
-    //public Container Take()
-    //{
-    //    if (Height == 0)
-    //        throw new ArgumentOutOfRangeException("PlacesCount");
-
-    //    return _containers.Pop();
-    //}
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 }

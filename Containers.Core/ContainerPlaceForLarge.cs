@@ -15,12 +15,12 @@ namespace Containers.Core
             _column = column;
         }
 
-        public override void Place(Container container)
+        public override void Place(ContainerData containerData)
         {
-            if (container.Type == ContainerType.Small)
+            if (containerData.Type == ContainerType.Small)
                 throw new ArgumentException("Typecast");
 
-            _column.Place(container);
+            _column.Place(containerData);
         }
 
         public override int Count => _column.Height;
