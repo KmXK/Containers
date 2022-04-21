@@ -18,7 +18,7 @@ foreach (var place in placeholder.Placements)
     {
         if (place is ContainerPlaceForLarge p)
         {
-            foreach (var container in p.Column.Containers)
+            foreach (var container in p.Column)
             {
                 Console.Write($"{container.Id}   ");
             }

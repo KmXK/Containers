@@ -13,7 +13,7 @@ public class Container : MonoBehaviour
 
     private Material _material;
     private Color _currentStateColor;
-    private bool _isSelected = false;
+    private bool _isSelected;
 
     private void Awake()
     {
