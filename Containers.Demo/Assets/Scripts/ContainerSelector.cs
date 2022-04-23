@@ -20,8 +20,15 @@ public class ContainerSelector : MonoBehaviour
     {
         if (_selectedContainer != null && _selectedContainer != container && container.Platform != null)
         {
+            if (!container.Data.Column.CheckContainerType(_selectedContainer.Data.Type))
+            {
+                _selectedContainer = null;
+                return;
+            }
+            
             if (_selectedContainer.Platform != null && !_selectedContainer.Platform.Remove(_selectedContainer))
             {
+                _selectedContainer = null;
                 return;
             }
             
@@ -39,6 +46,18 @@ public class ContainerSelector : MonoBehaviour
     {
         if (_selectedContainer == null)
             return;
+        
+        if (!platform.CheckContainerType(_selectedContainer.Data.Type))
+        {
+            _selectedContainer = null;
+            return;
+        }
+        
+        if (_selectedContainer.Platform != null && !_selectedContainer.Platform.Remove(_selectedContainer))
+        {
+            _selectedContainer = null;
+            return;
+        }
 
         platform.Place(_selectedContainer);
 

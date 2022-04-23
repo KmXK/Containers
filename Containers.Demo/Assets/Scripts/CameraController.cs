@@ -1,31 +1,49 @@
-using System;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    private bool _isRotating;
-
-    private void Update()
+    private Camera _camera;
+    
+    public Transform _target;
+    
+    void Start()
     {
-        if (_isRotating)
+        _camera = GetComponent<Camera>();
+        transform.LookAt(_target);
+    }
+    
+    private Vector3 previousPosition;
+    
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
         {
+            previousPosition = _camera.ScreenToViewportPoint(Input.mousePosition);
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            Vector3 newPosition = _camera.ScreenToViewportPoint(Input.mousePosition);
+            Vector3 direction = previousPosition - newPosition;
             
-        }
-    }
+            float rotationAroundYAxis = -direction.x * 180; // camera moves horizontally
+            float rotationAroundXAxis = direction.y * 180; // camera moves vertically
+            
+            _camera.transform.position = _target.position;
+            
+            _camera.transform.Rotate(new Vector3(1, 0, 0), rotationAroundXAxis);
+            _camera.transform.Rotate(new Vector3(0, 1, 0), rotationAroundYAxis, Space.World); // <— This is what makes it work!
 
-    private void OnMouseDown()
-    {
-        if (Input.GetMouseButtonDown(2))
-        {
-            _isRotating = true;
+            _camera.transform.Translate(new Vector3(0, 0, -20f));
+            
+            previousPosition = newPosition;
         }
-    }
-
-    private void OnMouseUp()
-    {
-        if (Input.GetMouseButtonUp(2))
+        
+        if (Input.GetMouseButton(1))
         {
-            _isRotating = false;
+            var rightVector = _target.right * Input.GetAxis("Mouse X");
+
+            _camera.transform.position -= rightVector;
+            _target.position -= rightVector;
         }
     }
 }

@@ -21,6 +21,11 @@ public class ContainerPlatform : MonoBehaviour
         ContainerSelector.Instance.SelectContainerPlatform(this);
     }
 
+    public bool CheckContainerType(ContainerType type)
+    {
+        return _place.CheckContainerType(type);
+    }
+
     public void Place(Container container)
     {
         _place.Place(container.Data);
