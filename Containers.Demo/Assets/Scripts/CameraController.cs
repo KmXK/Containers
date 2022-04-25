@@ -45,7 +45,7 @@ public class CameraController : MonoBehaviour
     {
         _camera = GetComponentInChildren<Camera>();
         _cameraTransform = _camera.transform;
-        _camera.transform.LookAt(_target);
+        _cameraTransform.LookAt(_target);
         CalculateCameraPosition();
     }
     
