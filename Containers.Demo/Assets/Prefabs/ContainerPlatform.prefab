@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1784364022445220858}
   - component: {fileID: 2390304350273709576}
   m_Layer: 0
-  m_Name: ContainerPlace
+  m_Name: Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -95,7 +95,7 @@ GameObject:
   - component: {fileID: 6643427621619934889}
   - component: {fileID: 1569229954749451594}
   m_Layer: 0
-  m_Name: ContainerPlace
+  m_Name: ContainerPlatform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -130,6 +130,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxHeight: 6
+  _isPlaceable: 1
 --- !u!65 &1569229954749451594
 BoxCollider:
   m_ObjectHideFlags: 0

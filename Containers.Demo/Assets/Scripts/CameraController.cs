@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour
@@ -9,8 +10,33 @@ public class CameraController : MonoBehaviour
     private Transform _cameraTransform;
     
     public Transform _target;
+
+    public void LookAt(Transform t)
+    {
+        var pos = t.position;
+        var delta = pos - _cameraTransform.position;
+        var a = delta.y < 0.1f ? pos.y / delta.y : 1;
+        pos.y = 0;
+        var vector = new Vector3(delta.x, 0, delta.z) * a;
+
+        StartCoroutine(MoveTo(pos + vector));
+    }
+
+    private IEnumerator MoveTo(Vector3 pos)
+    {
+        var delta = .5f;
+        var time = 0f;
+        var startPosition = _target.position;
+        while (time < delta)
+        {
+            _target.position = Vector3.Lerp(startPosition, pos, time / delta);
+            CalculateCameraPosition();
+            yield return null;
+            time += Time.deltaTime;
+        }
+    }
     
-    void Awake()
+    private void Awake()
     {
         _camera = GetComponentInChildren<Camera>();
         _cameraTransform = _camera.transform;

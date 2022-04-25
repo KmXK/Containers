@@ -224,6 +224,8 @@ MonoBehaviour:
     Id: 0
     Company: 
     SenderCountry: 
+  _focusedMaterial: {fileID: 2100000, guid: b0757b246a18b794ca6e126b0b6cc7b8, type: 2}
+  _unfocusedMaterial: {fileID: 2100000, guid: 81b083b5681e2de4da11035032597b9a, type: 2}
 --- !u!65 &3288335661701777409
 BoxCollider:
   m_ObjectHideFlags: 0

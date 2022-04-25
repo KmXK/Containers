@@ -9,8 +9,6 @@ public class ContainerPlatform : MonoBehaviour
 
     [SerializeField] private bool _isPlaceable = true;
     
-    
-    
     private ContainerPlace _place;
 
     public event Action<ContainerPlatform> Emptied; 

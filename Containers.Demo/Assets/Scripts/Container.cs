@@ -1,12 +1,13 @@
-using System;
 using Sources;
 using TMPro;
 using UnityEngine;
 
 public class Container : MonoBehaviour
 {
-    [SerializeField] 
-    private ContainerData _data;
+    [SerializeField] private ContainerData _data;
+    
+    [SerializeField] private Material _focusedMaterial;
+    [SerializeField] private Material _unfocusedMaterial;
 
     private Material _material;
     private bool _isSelected;
@@ -26,6 +27,21 @@ public class Container : MonoBehaviour
     {
         _isSelected = false;
         _material.color = ColorManager.Instance.DefaultContainerColor;
+    }
+
+    public void Focus()
+    {
+        VisualTransform.GetComponent<Renderer>().material = _focusedMaterial;
+    }
+
+    public void Unfocus()
+    {
+        VisualTransform.GetComponent<Renderer>().material = _unfocusedMaterial;
+    }
+
+    public void ResetFocus()
+    {
+        VisualTransform.GetComponent<Renderer>().material = _material;
     }
 
     private void Awake()
