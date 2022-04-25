@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class ColorManager : MonoBehaviour
 {
+    [Header("Container Colors")]
     public Color DefaultContainerColor;
     public Color EnteredContainerColor;
     public Color SelectedContainerColor;

@@ -16,9 +16,7 @@ public class ContainerPlatform : MonoBehaviour
 
     private void OnMouseUpAsButton()
     {
-        Debug.Log("Container place click!");
-        
-        ContainerSelector.Instance.SelectContainerPlatform(this);
+        ContainerSelector.Instance.PlatformClick(this);
     }
 
     public bool CheckContainerType(ContainerType type)
@@ -47,29 +45,21 @@ public class ContainerPlatform : MonoBehaviour
 
     private void MoveContainer(Container container)
     {
-        var containerTransform = container.transform;
-        containerTransform.SetParent(transform);
+        var containerVisualTransform = container.VisualTransform;
+        container.transform.SetParent(transform);
 
         var (column, height) = _place.GetColumnInfo(container.Data.Column);
 
-        var containerScale = containerTransform.localScale;
-        var localScale = transform.localScale;
-        var y = (localScale.y + containerScale.y) / 2 +
-                (height - 1) * containerScale.y;
-        float x;
+        var containerScale = containerVisualTransform.localScale;
+        var y = (height - 1) * containerScale.y;
 
-        switch (container.Data.Type)
+        var x = container.Data.Type switch
         {
-            case ContainerType.Small:
-                x = (column * 2 - 1) * (11 * containerScale.x / 20);
-                break;
-            case ContainerType.Large:
-                x = 0;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+            ContainerType.Small => (column * 2 - 1) * (11 * containerScale.x / 20),
+            ContainerType.Large => 0,
+            _ => throw new ArgumentOutOfRangeException()
+        };
 
-        containerTransform.localPosition = new Vector2(x, y);
+        container.transform.localPosition = new Vector2(x, y);
     }
 }

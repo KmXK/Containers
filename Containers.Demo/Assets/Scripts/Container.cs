@@ -8,30 +8,50 @@ public class Container : MonoBehaviour
     private ContainerData _data;
 
     private Material _material;
+    private bool _isSelected;
 
+    public Transform VisualTransform { get; private set; }
     public ContainerData Data => _data;
     public ContainerPlatform Platform { get; set; }
 
+    public void Select()
+    {
+        _isSelected = true;
+        _material.color = ColorManager.Instance.SelectedContainerColor;
+    }
+
+    public void Deselect()
+    {
+        _isSelected = false;
+        _material.color = ColorManager.Instance.DefaultContainerColor;
+    }
+
     private void Start()
     {
-        _material = transform.GetComponent<Renderer>().material;
+        VisualTransform = gameObject.transform.GetChild(0);
+
+        _material = VisualTransform.GetComponent<Renderer>().material;
         _material.color = ColorManager.Instance.DefaultContainerColor;
     }
 
     private void OnMouseEnter()
     {
-        _material.color = ColorManager.Instance.EnteredContainerColor;
+        if(!_isSelected)
+        {
+            _material.color = ColorManager.Instance.EnteredContainerColor;
+        }
     }
 
     private void OnMouseExit()
     {
-        _material.color = ColorManager.Instance.DefaultContainerColor;
+        if(!_isSelected)
+        {
+            _material.color = ColorManager.Instance.DefaultContainerColor;
+        }
     }
 
     private void OnMouseUpAsButton()
     {
-        Debug.Log("Container click!");
-
-        ContainerSelector.Instance.SelectContainer(this);
+        ContainerSelector.Instance.ContainerClick(this);
     }
 }

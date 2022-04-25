@@ -16,51 +16,68 @@ public class ContainerSelector : MonoBehaviour
         }
     }
 
-    public void SelectContainer(Container container)
+    public void ContainerClick(Container container)
     {
         if (_selectedContainer != null && _selectedContainer != container && container.Platform != null)
         {
             if (!container.Data.Column.CheckContainerType(_selectedContainer.Data.Type))
             {
-                _selectedContainer = null;
+                DeselectContainer();
                 return;
             }
             
             if (_selectedContainer.Platform != null && !_selectedContainer.Platform.Remove(_selectedContainer))
             {
-                _selectedContainer = null;
+                DeselectContainer();
                 return;
             }
             
             container.Platform.PlaceOn(_selectedContainer, container);
 
-            _selectedContainer = null;
+            DeselectContainer();
         }
         else
         {
-            _selectedContainer = container;
+            SelectContainer(container);
         }
     }
 
-    public void SelectContainerPlatform(ContainerPlatform platform)
+    public void PlatformClick(ContainerPlatform platform)
     {
         if (_selectedContainer == null)
             return;
         
         if (!platform.CheckContainerType(_selectedContainer.Data.Type))
         {
-            _selectedContainer = null;
+            DeselectContainer();
             return;
         }
         
         if (_selectedContainer.Platform != null && !_selectedContainer.Platform.Remove(_selectedContainer))
         {
-            _selectedContainer = null;
+            DeselectContainer();
             return;
         }
 
         platform.Place(_selectedContainer);
 
-        _selectedContainer = null;
+        DeselectContainer();
+    }
+
+    private void SelectContainer(Container container)
+    {
+        if(_selectedContainer != null)
+            DeselectContainer();
+        _selectedContainer = container;
+        container.Select();
+    }
+
+    private void DeselectContainer()
+    {
+        if(_selectedContainer != null)
+        {
+            _selectedContainer.Deselect();
+            _selectedContainer = null;
+        }
     }
 }
