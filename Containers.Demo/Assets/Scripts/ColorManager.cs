@@ -3,14 +3,13 @@ using UnityEngine;
 
 public class ColorManager : MonoBehaviour
 {
-    [Header("Container Colors")] 
+    [Header("Container Colors")]
+    [SerializeField] [Range(0, 1)]
+    private float _unfocusedContainerAlpha;
     [SerializeField]
-    private ContainerMaterialGroup _defaultMaterialGroup;
-    [SerializeField] 
-    private ContainerMaterialGroup _focusedMaterialGroup;
-    [SerializeField] 
-    private ContainerMaterialGroup _unfocusedMaterialGroup;
+    private ContainerMaterialGroup[] _materialGroups;
 
+    public float UnfocusedContainerAlpha => _unfocusedContainerAlpha;
     public IDictionary<ContainerState, ContainerMaterialGroup> MaterialGroups = 
         new Dictionary<ContainerState, ContainerMaterialGroup>();
     
@@ -21,9 +20,10 @@ public class ColorManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            MaterialGroups[ContainerState.Default] = _defaultMaterialGroup;
-            MaterialGroups[ContainerState.Focused] = _focusedMaterialGroup;
-            MaterialGroups[ContainerState.Unfocused] = _unfocusedMaterialGroup;
+            foreach (var materialGroup in _materialGroups)
+            {
+                MaterialGroups[materialGroup.State] = materialGroup;
+            }
         }
         else
         {

@@ -13,13 +13,16 @@ public class CameraController : MonoBehaviour
 
     public void LookAt(Transform t)
     {
-        var pos = t.position;
-        var delta = pos - _cameraTransform.position;
-        var a = delta.y < 0.1f ? pos.y / delta.y : 1;
-        pos.y = 0;
-        var vector = new Vector3(delta.x, 0, delta.z) * a;
-
-        StartCoroutine(MoveTo(pos + vector));
+        var pos = GetIntersectWithLineAndPlane(t.position, _camera.transform.forward,
+            Vector3.up, Vector3.zero);
+        StartCoroutine(MoveTo(pos));
+    }
+    
+    private static Vector3 GetIntersectWithLineAndPlane(Vector3 point, Vector3 direct, Vector3 planeNormal, Vector3 planePoint)
+    {
+        var d = Vector3.Dot(planePoint - point, planeNormal) / Vector3.Dot(direct.normalized, planeNormal);
+ 
+        return d * direct.normalized + point;
     }
 
     private IEnumerator MoveTo(Vector3 pos)
@@ -34,6 +37,8 @@ public class CameraController : MonoBehaviour
             yield return null;
             time += Time.deltaTime;
         }
+
+        _target.position = pos;
     }
     
     private void Awake()

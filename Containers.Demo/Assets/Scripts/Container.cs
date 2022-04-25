@@ -7,9 +7,10 @@ public class Container : MonoBehaviour
     [SerializeField] private ContainerData _data;
 
     private bool _isSelected;
-    private TextMeshPro _text;
+    private TextMeshPro[] _text;
     private ContainerState _state;
-    private Renderer _renderer;
+    private Material _material;
+    private float _alpha = 1f;
 
     private ContainerMaterialGroup MaterialGroup => ColorManager.Instance.MaterialGroups[_state];
     
@@ -31,42 +32,49 @@ public class Container : MonoBehaviour
 
     public void Focus()
     {
-        SetState(ContainerState.Focused);
+        _alpha = 1f;
+        SetMaterialColor(MaterialGroup.StandardColor);
     }
 
     public void Unfocus()
     {
-        SetState(ContainerState.Unfocused);
+        _alpha = ColorManager.Instance.UnfocusedContainerAlpha;
+        Debug.Log(_alpha);
+        SetMaterialColor(MaterialGroup.StandardColor);
     }
 
     public void ResetFocus()
     {
-        SetState(ContainerState.Default);
+        _alpha = 1f;
+        SetMaterialColor(MaterialGroup.StandardColor);
     }
 
-    private void SetState(ContainerState state)
+    public void SetState(ContainerState state)
     {
         _state = state;
-        _renderer.material = MaterialGroup.Material;
         SetMaterialColor(MaterialGroup.StandardColor);
     }
 
     private void SetMaterialColor(Color color)
     {
-        _renderer.material.color = color;
+        color.a = _alpha;
+        _material.color = color;
     }
 
     private void Awake()
     {
         VisualTransform = transform.GetChild(0);
-        _renderer = VisualTransform.GetComponent<Renderer>();
-        _text = GetComponentInChildren<TextMeshPro>();
+        _material = VisualTransform.GetComponent<Renderer>().material;
+        _text = GetComponentsInChildren<TextMeshPro>();
     }
 
     private void Start()
     {
         SetState(ContainerState.Default);
-        _text.text = _data.Id.ToString();
+        foreach (var t in _text)
+        {
+            t.text = _data.Id.ToString();
+        }
     }
 
     private void OnMouseEnter()

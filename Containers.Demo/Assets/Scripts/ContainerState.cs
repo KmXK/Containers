@@ -1,4 +1,4 @@
 ﻿public enum ContainerState
 {
-    Default, Focused, Unfocused
+    Default, Loading, Preloading, Blocking, ProblemLoading
 }

@@ -27,6 +27,8 @@ public class ContainerFocuser : MonoBehaviour
                 c.Unfocus();
             }
         }
+        
+        _cameraController.LookAt(container.transform);
     }
 
     public void ResetFocus()
