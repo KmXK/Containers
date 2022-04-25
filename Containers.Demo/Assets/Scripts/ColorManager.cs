@@ -9,7 +9,7 @@ public class ColorManager : MonoBehaviour
     
     public static ColorManager Instance { get; private set; }
     
-    void Start()
+    void Awake()
     {
         if (Instance == null)
         {

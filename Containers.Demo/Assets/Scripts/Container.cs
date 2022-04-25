@@ -1,5 +1,6 @@
 using System;
 using Sources;
+using TMPro;
 using UnityEngine;
 
 public class Container : MonoBehaviour
@@ -9,6 +10,7 @@ public class Container : MonoBehaviour
 
     private Material _material;
     private bool _isSelected;
+    private TextMeshPro _text;
 
     public Transform VisualTransform { get; private set; }
     public ContainerData Data => _data;
@@ -26,12 +28,17 @@ public class Container : MonoBehaviour
         _material.color = ColorManager.Instance.DefaultContainerColor;
     }
 
+    private void Awake()
+    {
+        VisualTransform = transform.GetChild(0);
+        _material = VisualTransform.GetComponent<Renderer>().material;
+        _text = GetComponentInChildren<TextMeshPro>();
+    }
+
     private void Start()
     {
-        VisualTransform = gameObject.transform.GetChild(0);
-
-        _material = VisualTransform.GetComponent<Renderer>().material;
         _material.color = ColorManager.Instance.DefaultContainerColor;
+        _text.text = _data.Id.ToString();
     }
 
     private void OnMouseEnter()

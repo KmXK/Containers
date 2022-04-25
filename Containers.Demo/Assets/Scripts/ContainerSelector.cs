@@ -6,7 +6,7 @@ public class ContainerSelector : MonoBehaviour
 
     public static ContainerSelector Instance { get; private set; }
     
-    void Start()
+    void Awake()
     {
         if (Instance == null)
             Instance = this;
@@ -26,7 +26,7 @@ public class ContainerSelector : MonoBehaviour
                 return;
             }
             
-            if (_selectedContainer.Platform != null && !_selectedContainer.Platform.Remove(_selectedContainer))
+            if (_selectedContainer.Platform != null && !_selectedContainer.Platform.TryRemove(_selectedContainer))
             {
                 DeselectContainer();
                 return;
@@ -53,7 +53,7 @@ public class ContainerSelector : MonoBehaviour
             return;
         }
         
-        if (_selectedContainer.Platform != null && !_selectedContainer.Platform.Remove(_selectedContainer))
+        if (_selectedContainer.Platform != null && !_selectedContainer.Platform.TryRemove(_selectedContainer))
         {
             DeselectContainer();
             return;

@@ -4,12 +4,18 @@ using UnityEngine;
 
 public class ContainerPlatform : MonoBehaviour
 {
-    [Range(5, 10)]
+    [Range(1, 10)]
     [SerializeField] private int _maxHeight = 5;
+
+    [SerializeField] private bool _isPlaceable = true;
+    
+    
     
     private ContainerPlace _place;
 
-    private void Start()
+    public event Action<ContainerPlatform> Emptied; 
+
+    private void Awake()
     {
         _place = new ContainerPlace(_maxHeight);
     }
@@ -21,7 +27,7 @@ public class ContainerPlatform : MonoBehaviour
 
     public bool CheckContainerType(ContainerType type)
     {
-        return _place.CheckContainerType(type);
+        return _isPlaceable && _place.CheckContainerType(type);
     }
 
     public void Place(Container container)
@@ -38,9 +44,15 @@ public class ContainerPlatform : MonoBehaviour
         MoveContainer(containerToPlace);
     }
 
-    public bool Remove(Container container)
+    public bool TryRemove(Container container)
     {
-        return _place.TryTake(container.Data);
+        var isTaken = _place.TryTake(container.Data);
+        if (isTaken && _place.IsEmpty())
+        {
+            Emptied?.Invoke(this);
+        }
+
+        return isTaken;
     }
 
     private void MoveContainer(Container container)

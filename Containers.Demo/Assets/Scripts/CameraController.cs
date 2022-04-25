@@ -1,20 +1,27 @@
+using System;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+    [SerializeField] private float _distance = 20f;
+    
     private Camera _camera;
+    private Transform _cameraTransform;
     
     public Transform _target;
     
-    void Start()
+    void Awake()
     {
-        _camera = GetComponent<Camera>();
-        transform.LookAt(_target);
+        _camera = GetComponentInChildren<Camera>();
+        _cameraTransform = _camera.transform;
+        _camera.transform.LookAt(_target);
+        CalculateCameraPosition();
     }
     
     private Vector3 previousPosition;
+    private float rotationAroundXAxis, rotationAroundYAxis;
     
-    void Update()
+    private void Update()
     {
         if (Input.GetMouseButtonDown(0))
         {
@@ -25,25 +32,53 @@ public class CameraController : MonoBehaviour
             Vector3 newPosition = _camera.ScreenToViewportPoint(Input.mousePosition);
             Vector3 direction = previousPosition - newPosition;
             
-            float rotationAroundYAxis = -direction.x * 180; // camera moves horizontally
-            float rotationAroundXAxis = direction.y * 180; // camera moves vertically
-            
-            _camera.transform.position = _target.position;
-            
-            _camera.transform.Rotate(new Vector3(1, 0, 0), rotationAroundXAxis);
-            _camera.transform.Rotate(new Vector3(0, 1, 0), rotationAroundYAxis, Space.World); // <— This is what makes it work!
+            rotationAroundYAxis = -direction.x * 180; // camera moves horizontally
+            rotationAroundXAxis = direction.y * 180; // camera moves vertically
 
-            _camera.transform.Translate(new Vector3(0, 0, -20f));
-            
+            CalculateCameraPosition();
             previousPosition = newPosition;
         }
         
         if (Input.GetMouseButton(1))
         {
-            var rightVector = _target.right * Input.GetAxis("Mouse X");
+            var rightVector = _cameraTransform.right.normalized * Input.GetAxis("Mouse X");
+            var forwardVector = Vector3.ProjectOnPlane(_cameraTransform.forward, Vector3.up).normalized *
+                              Input.GetAxis("Mouse Y");
 
-            _camera.transform.position -= rightVector;
-            _target.position -= rightVector;
+            var vector = rightVector + forwardVector;
+            _cameraTransform.position -= vector;
+            _target.position -= vector;
         }
+
+        var scroll = Input.GetAxis("Mouse ScrollWheel");
+        if (scroll != 0)
+        {
+            _distance -= scroll * 10f;
+            _distance = Math.Clamp(_distance, 5, 35);
+            CalculateCameraPosition();
+        }
+    }
+
+    private void CalculateCameraPosition()
+    {
+        _cameraTransform.position = _target.position;
+            
+        _cameraTransform.Rotate(new Vector3(1, 0, 0), rotationAroundXAxis);
+        _cameraTransform.Rotate(new Vector3(0, 1, 0), rotationAroundYAxis, Space.World); // <— This is what makes it work!
+
+        var r = _cameraTransform.rotation;
+        var e = r.eulerAngles;
+        if (e.x is < 10 or > 180)
+            e.x = 10;
+        if (e.z > 179)
+        {
+            e.z = 0;
+            e.y -= 180;
+        }
+        
+        r.eulerAngles = e;
+        _cameraTransform.rotation = r;
+        
+        _cameraTransform.Translate(new Vector3(0, 0, -_distance));
     }
 }

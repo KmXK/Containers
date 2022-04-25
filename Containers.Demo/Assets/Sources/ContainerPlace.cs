@@ -34,6 +34,11 @@ namespace Sources
             }
         }
 
+        public bool IsEmpty()
+        {
+            return _firstColumn.Height == 0 && _secondColumn.Height == 0;
+        }
+
         public bool TryTake(ContainerData container)
         {
             return _firstColumn.TryTake(container) || _secondColumn.TryTake(container);
