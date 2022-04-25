@@ -715,9 +715,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07a203be4d759414eacb3145bccc84c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DefaultContainerColor: {r: 1, g: 0, b: 0, a: 1}
-  EnteredContainerColor: {r: 0.754717, g: 0, b: 0, a: 1}
-  SelectedContainerColor: {r: 0.4716981, g: 0, b: 0, a: 1}
+  _defaultMaterialGroup:
+    Material: {fileID: 2100000, guid: 825ef2b3450634b478f442a2f0990694, type: 2}
+    StandardColor: {r: 1, g: 0, b: 0, a: 1}
+    EnterColor: {r: 1, g: 0.4009434, b: 0.4009434, a: 1}
+    SelectedColor: {r: 0.6603774, g: 0, b: 0, a: 1}
+  _focusedMaterialGroup:
+    Material: {fileID: 2100000, guid: b0757b246a18b794ca6e126b0b6cc7b8, type: 2}
+    StandardColor: {r: 0, g: 1, b: 0.04445076, a: 1}
+    EnterColor: {r: 0.5707547, g: 1, b: 0.64279455, a: 1}
+    SelectedColor: {r: 0, g: 0.745283, b: 0.0751361, a: 1}
+  _unfocusedMaterialGroup:
+    Material: {fileID: 2100000, guid: 81b083b5681e2de4da11035032597b9a, type: 2}
+    StandardColor: {r: 1, g: 0, b: 0, a: 0.23529412}
+    EnterColor: {r: 1, g: 0.40000004, b: 0.40000004, a: 0.23529412}
+    SelectedColor: {r: 0.65882355, g: 0, b: 0, a: 0.23529412}
 --- !u!4 &320164243
 Transform:
   m_ObjectHideFlags: 0
