@@ -12,8 +12,15 @@ public class ContainerPlatform : MonoBehaviour
 
     private ContainerPlace _place;
 
+    public bool IsPlaceable
+    {
+        get => _isPlaceable;
+        set => _isPlaceable = value;
+    }
+
     public event Action<ContainerPlatform> Emptied;
     public event Func<ContainerPlatform, Container, bool> Placing;
+    public event Action<ContainerPlatform, Container> Placed;
 
     private void Awake()
     {
@@ -48,6 +55,8 @@ public class ContainerPlatform : MonoBehaviour
         _place.Place(container.Data);
         container.Platform = this;
         MoveContainer(container);
+        
+        Placed?.Invoke(this, container);
     }
 
     public void PlaceOn(Container containerToPlace, Container originContainer)
@@ -58,6 +67,8 @@ public class ContainerPlatform : MonoBehaviour
         _place.Place(containerToPlace.Data, originContainer.Data.Column);
         containerToPlace.Platform = this;
         MoveContainer(containerToPlace);
+        
+        Placed?.Invoke(this, containerToPlace);
     }
 
     public bool TryRemove(Container container)

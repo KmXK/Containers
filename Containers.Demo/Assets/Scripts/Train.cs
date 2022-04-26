@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Sources;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -12,17 +13,23 @@ public class Train : MonoBehaviour
     
     [SerializeField] private AnimationCurve _movingCurve;
     
+    private const float WagonLength = 6f;
+    private const float WagonOffset = 0.2f;
+    
     private Transform _wagonsTransform;
     private float _animationTime;
     private ContainerPlatform[] _wagonPlatforms;
+    private List<ContainerPlatform> _platformToWait;
 
     private int _trainWindowSize;
     private int _currentWindowIndex;
+    private bool _isMoving;
 
     private Vector3 _trainLoadPosition;
     private Vector3 _trainLeavePosition;
 
     private Dictionary<ContainerPlatform, List<Container>> _platformContainers;
+    private Vector3 MovingDirection => (_trainLeavePosition - _trainLoadPosition).normalized;
 
     public event Action<Train> Leaved;
 
@@ -40,16 +47,14 @@ public class Train : MonoBehaviour
         }
 
         var wagonsCount = largeContainers.Count + smallContainers.Count / 2;
+        wagonsCount = Math.Clamp(wagonsCount, minWagons, maxWagons);
         _wagonPlatforms = new ContainerPlatform[wagonsCount];
         _platformContainers = new Dictionary<ContainerPlatform, List<Container>>(wagonsCount);
 
         if (wagonsCount < minWagons)
             return false;
-
-        wagonsCount = Math.Clamp(wagonsCount, minWagons, maxWagons);
         
         GenerateWagons(wagonsCount);
-
         GenerateList(largeContainers, smallContainers);
 
         return true;
@@ -63,7 +68,7 @@ public class Train : MonoBehaviour
         
         _trainWindowSize = trainWindow;
         _currentWindowIndex = -1;
-        MoveWindow();
+        StartCoroutine(MoveWindow());
     }
 
     private void Awake()
@@ -112,27 +117,46 @@ public class Train : MonoBehaviour
     
     private void GenerateWagons(int count)
     {
-        const float wagonLength = 6f;
-        const float wagonOffset = 0.2f;
-
-        var localPosition = new Vector3(wagonLength + wagonOffset, 0, 0);
+        var localPosition = new Vector3(WagonLength + WagonOffset, 0, 0);
 
         Instantiate(_headWagonPrefab, _wagonsTransform).transform.localPosition = localPosition;
         
         for (var i = 0; i < count; i++)
         {
-            localPosition.x -= wagonLength + wagonOffset;
+            localPosition.x -= WagonLength + WagonOffset;
 
             var wagon = Instantiate(_wagonPrefab, _wagonsTransform).transform;
             wagon.localPosition = localPosition;
             var platform = wagon.GetChild(0).GetComponentInChildren<ContainerPlatform>();
             _wagonPlatforms[i] = platform;
             platform.Placing += OnPlatformPlacing;
+            platform.Placed += OnPlatformPlaced;
+            platform.IsPlaceable = false;
         }
     }
-    
-    private IEnumerator MovingCoroutine(Vector3 endPosition)
+
+    private void OnPlatformPlaced(ContainerPlatform platform, Container container)
     {
+        if (_platformToWait.Contains(platform))
+        {
+            _platformContainers[platform].Remove(container);
+            if (!_platformContainers[platform].Any())
+            {
+                _platformToWait.Remove(platform);
+
+                if (!_platformToWait.Any())
+                {
+                    StartCoroutine(MoveWindow());
+                }
+            }
+        }
+    }
+
+    private IEnumerator MoveTo(Vector3 endPosition)
+    {
+        _isMoving = true;
+
+        _animationTime = 0;
         var startPosition = transform.position;
         var distance = endPosition - startPosition;
         
@@ -144,32 +168,59 @@ public class Train : MonoBehaviour
             
             _animationTime += Time.deltaTime;
         }
+
+        _isMoving = false;
     }
 
-    private void EndMoving()
+    private IEnumerator EndMoving()
     {
+        var delta = MovingDirection * (_wagonPlatforms.Length * (WagonLength + WagonOffset));
+        
+        yield return StartCoroutine(MoveTo(_trainLeavePosition + delta));
         Leaved?.Invoke(this);
     }
     
-    private void MoveWindow()
+    private IEnumerator MoveWindow()
     {
-        var skipPlatforms = _currentWindowIndex * _trainWindowSize;
-        if (_wagonPlatforms.Length < skipPlatforms)
+        while (_isMoving)
         {
-            EndMoving();
-            return;
+            yield return null;
         }
         
-        // change window index
-        
-        // set platforms placeable options
-        
-        // создать какой-то массив ожидающих платформ
-        // создать событие Placed, отлавливать его и
-        // ждать ситуации, когда всё будет заполнено
+        var skipPlatforms = _currentWindowIndex * _trainWindowSize;
 
-        // высчитывание позиции вагона
-        // просто добавлять skipPlatforms * wagonX... к _trainLoadPosition
-        //StartCoroutine(MovingCoroutine(_trainLoadPosition));
+        var isPlaceable = false;
+        int startIndex = 0, endIndex = 0; 
+        for (var t = 0; t < 2; t++)
+        {
+            startIndex = Math.Max(skipPlatforms, 0);
+            endIndex = Math.Min(skipPlatforms + _trainWindowSize, _wagonPlatforms.Length);
+            for (var i = startIndex; i < endIndex; i++)
+            {
+                _wagonPlatforms[i].IsPlaceable = isPlaceable;
+            }
+
+            if (t == 0)
+            {
+                _currentWindowIndex++;
+                isPlaceable = true;
+                skipPlatforms += _trainWindowSize;
+            }
+        }
+        
+        if (_wagonPlatforms.Length <= skipPlatforms)
+        {
+            yield return EndMoving();
+            yield break;
+        }
+
+        _platformToWait = new List<ContainerPlatform>(endIndex - startIndex);
+        for (var i = 0; i < _platformToWait.Capacity; i++)
+        {
+            _platformToWait.Add(_wagonPlatforms[startIndex + i]);
+        }
+
+        var position = _trainLoadPosition + MovingDirection * (skipPlatforms * (WagonLength + WagonOffset));
+        yield return MoveTo(position);
     }
 }
