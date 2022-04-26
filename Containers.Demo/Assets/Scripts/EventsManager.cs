@@ -57,7 +57,7 @@ public class EventsManager : MonoBehaviour
 
         _isTrainWaiting = true;
         
-        train.MoveToLoading(_trainLoadPosition, _trainLeavePosition);
+        train.MoveToLoading(_trainLoadPosition, _trainLeavePosition, _trainWindowWagonsCount);
         train.Leaved += _ => _isTrainWaiting = false;
     }
 }

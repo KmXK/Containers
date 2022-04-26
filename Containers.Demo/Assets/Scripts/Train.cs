@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Sources;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -12,11 +11,16 @@ public class Train : MonoBehaviour
     [SerializeField] private GameObject _headWagonPrefab;
     
     [SerializeField] private AnimationCurve _movingCurve;
-
-
+    
     private Transform _wagonsTransform;
     private float _animationTime;
     private ContainerPlatform[] _wagonPlatforms;
+
+    private int _trainWindowSize;
+    private int _currentWindowIndex;
+
+    private Vector3 _trainLoadPosition;
+    private Vector3 _trainLeavePosition;
 
     private Dictionary<ContainerPlatform, List<Container>> _platformContainers;
 
@@ -52,9 +56,14 @@ public class Train : MonoBehaviour
     }
 
 
-    public void MoveToLoading(Transform trainLoadPosition, Transform trainLeavePosition)
+    public void MoveToLoading(Transform trainLoadPosition, Transform trainLeavePosition, int trainWindow)
     {
-        StartCoroutine(MovingCoroutine(trainLoadPosition.position));
+        _trainLoadPosition = trainLoadPosition.position;
+        _trainLeavePosition = trainLeavePosition.position;
+        
+        _trainWindowSize = trainWindow;
+        _currentWindowIndex = -1;
+        MoveWindow();
     }
 
     private void Awake()
@@ -135,5 +144,32 @@ public class Train : MonoBehaviour
             
             _animationTime += Time.deltaTime;
         }
+    }
+
+    private void EndMoving()
+    {
+        Leaved?.Invoke(this);
+    }
+    
+    private void MoveWindow()
+    {
+        var skipPlatforms = _currentWindowIndex * _trainWindowSize;
+        if (_wagonPlatforms.Length < skipPlatforms)
+        {
+            EndMoving();
+            return;
+        }
+        
+        // change window index
+        
+        // set platforms placeable options
+        
+        // создать какой-то массив ожидающих платформ
+        // создать событие Placed, отлавливать его и
+        // ждать ситуации, когда всё будет заполнено
+
+        // высчитывание позиции вагона
+        // просто добавлять skipPlatforms * wagonX... к _trainLoadPosition
+        //StartCoroutine(MovingCoroutine(_trainLoadPosition));
     }
 }
