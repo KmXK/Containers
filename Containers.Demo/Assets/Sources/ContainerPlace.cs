@@ -7,6 +7,9 @@ namespace Sources
         private readonly ContainerColumn _firstColumn;
         private readonly ContainerColumn _secondColumn;
 
+        public ContainerColumn FirstColumn => _firstColumn;
+        public ContainerColumn SecondColumn => _secondColumn;
+
         public ContainerPlace(int maxHeight)
         {
             _firstColumn = new ContainerColumn(maxHeight);

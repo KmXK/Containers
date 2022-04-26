@@ -8,13 +8,13 @@ public class Van : MonoBehaviour
 {
     [SerializeField] private ContainerPlatform _platform;
     
-    private TextMeshPro[] _smallTexts;
-    private TextMeshPro _largeText;
+    private TextMeshProUGUI[] _smallTexts;
+    private TextMeshProUGUI _largeText;
 
     private void Awake()
     {
         var canvas = transform.GetChild(0).GetComponentInChildren<Canvas>().transform;
-        var texts = canvas.GetComponentsInChildren<TextMeshPro>();
+        var texts = canvas.GetComponentsInChildren<TextMeshProUGUI>(); 
         _smallTexts = texts[..2];
         _largeText = texts[2];
     }
@@ -30,11 +30,26 @@ public class Van : MonoBehaviour
         {
             smallText.gameObject.SetActive(true);
         }
+        _largeText.gameObject.SetActive(false);
     }
 
     public void SetLargeText(string id)
     {
         _largeText.text = id;
+
+        foreach (var t in _smallTexts) t.gameObject.SetActive(false);
         _largeText.gameObject.SetActive(true);
+    }
+
+    public void DisableText()
+    {
+        foreach (var t in _smallTexts) t.gameObject.SetActive(false);
+        _largeText.gameObject.SetActive(false);
+    }
+
+    public void DisableSmallText(int index)
+    {
+        if(index >= 0 && index < _smallTexts.Length)
+            _smallTexts[index].gameObject.SetActive(false);
     }
 }

@@ -125,7 +125,34 @@ public class Train : MonoBehaviour
 
         if (_platformContainers[platform].Contains(container))
         {
-            return true;
+            var containers = _platformContainers[platform];
+
+            platform.Placing -= OnPlatformPlacing;
+            
+            var van = _vans.First(v => v.Platform == platform);
+            
+            if (containers.Count == 1)
+            {
+                platform.Place(container);
+                van.DisableText();
+            }
+            else
+            {
+                var column = platform.ContainerPlace.FirstColumn;
+                var index = 0;
+                if (containers[0] != container)
+                {
+                    column = platform.ContainerPlace.SecondColumn;
+                    index = 1;
+                }
+
+                van.DisableSmallText(index);
+                platform.Place(container, column);
+            }
+
+            platform.Placing += OnPlatformPlacing;
+
+            return false;
         }
 
         return false;

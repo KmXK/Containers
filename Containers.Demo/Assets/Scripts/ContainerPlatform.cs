@@ -12,6 +12,8 @@ public class ContainerPlatform : MonoBehaviour
 
     private ContainerPlace _place;
 
+    public ContainerPlace ContainerPlace => _place;
+
     public bool IsPlaceable
     {
         get => _isPlaceable;
@@ -53,6 +55,18 @@ public class ContainerPlatform : MonoBehaviour
             return;
         
         _place.Place(container.Data);
+        container.Platform = this;
+        MoveContainer(container);
+        
+        Placed?.Invoke(this, container);
+    }
+
+    public void Place(Container container, ContainerColumn column)
+    {
+        if (!CanPlace(container, column))
+            return;
+        
+        _place.Place(container.Data, column);
         container.Platform = this;
         MoveContainer(container);
         
