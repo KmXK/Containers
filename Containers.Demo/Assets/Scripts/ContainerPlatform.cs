@@ -33,17 +33,9 @@ public class ContainerPlatform : MonoBehaviour
         ContainerSelector.Instance.PlatformClick(this);
     }
 
-    public bool CheckContainerType(ContainerType type)
-    {
-        return _isPlaceable && _place.CheckContainerType(type);
-    }
-
     public bool CanTake(Container container) => _place.CanTake(container.Data);
 
-    public bool CanPlace(Container container)
-    {
-        return CanPlace(container, null);
-    }
+    public bool CanPlace(Container container) => CanPlace(container, null);
 
     private bool CanPlace(Container container, ContainerColumn column)
     {

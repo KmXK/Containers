@@ -75,12 +75,7 @@ namespace Sources
                     c = _secondColumn;
             }
             
-            return c.CanPlace(containerData);
-        }
-        
-        public bool CheckContainerType(ContainerType type)
-        {
-            return _firstColumn.CheckContainerType(type) && _secondColumn.CheckContainerType(type);
+            return CheckContainerType(containerData.Type) &&  c.CanPlace(containerData);
         }
 
         public (int Column, int Height) GetColumnInfo(ContainerColumn column)
@@ -89,6 +84,11 @@ namespace Sources
                 return (0, _firstColumn.Height);
             else
                 return (1, _secondColumn.Height);
+        }
+        
+        private bool CheckContainerType(ContainerType type)
+        {
+            return _firstColumn.CheckContainerType(type) && _secondColumn.CheckContainerType(type);
         }
 
         private void PlaceSmall(ContainerData container, ContainerColumn column)

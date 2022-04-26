@@ -39,7 +39,6 @@ public class Container : MonoBehaviour
     public void Unfocus()
     {
         _alpha = ColorManager.Instance.UnfocusedContainerAlpha;
-        Debug.Log(_alpha);
         SetMaterialColor(MaterialGroup.StandardColor);
     }
 
