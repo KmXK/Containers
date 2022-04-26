@@ -18,7 +18,7 @@ public class Train : MonoBehaviour
     
     private Transform _wagonsTransform;
     private float _animationTime;
-    private ContainerPlatform[] _wagonPlatforms;
+    private Wagon[] _wagons;
     private List<ContainerPlatform> _platformToWait;
 
     private int _trainWindowSize;
@@ -48,7 +48,7 @@ public class Train : MonoBehaviour
 
         var wagonsCount = largeContainers.Count + smallContainers.Count / 2;
         wagonsCount = Math.Clamp(wagonsCount, minWagons, maxWagons);
-        _wagonPlatforms = new ContainerPlatform[wagonsCount];
+        _wagons = new Wagon[wagonsCount];
         _platformContainers = new Dictionary<ContainerPlatform, List<Container>>(wagonsCount);
 
         if (wagonsCount < minWagons)
@@ -78,10 +78,16 @@ public class Train : MonoBehaviour
     
     private void GenerateList(List<Container> largeContainers, List<Container> smallContainers)
     {
-        var lists = new List<(int Count, List<Container> List)> {(1, largeContainers), (2, smallContainers)};
-
-        foreach (var platform in _wagonPlatforms)
+        var lists = new List<(int Count, List<Container> List, ContainerType Type)>
         {
+            (1, largeContainers, ContainerType.Large),
+            (2, smallContainers, ContainerType.Small)
+        };
+
+        foreach (var wagon in _wagons)
+        {
+            var platform = wagon.Platform; 
+            
             _platformContainers.Add(platform, new List<Container>());
             
             var listData = lists[Random.Range(0, lists.Count)];
@@ -93,6 +99,15 @@ public class Train : MonoBehaviour
                 var container = list[Random.Range(0, list.Count)];
                 list.Remove(container);
                 _platformContainers[platform].Add(container);
+            }
+
+            if (listData.Type == ContainerType.Large)
+            {
+                wagon.SetLargeText(_platformContainers[platform].First().Data.Id.ToString());
+            }
+            else
+            {
+                wagon.SetSmallTexts(_platformContainers[platform].Select(c => c.Data.Id.ToString()).ToArray());
             }
 
             if (listData.List.Count == 0)
@@ -125,10 +140,11 @@ public class Train : MonoBehaviour
         {
             localPosition.x -= WagonLength + WagonOffset;
 
-            var wagon = Instantiate(_wagonPrefab, _wagonsTransform).transform;
-            wagon.localPosition = localPosition;
-            var platform = wagon.GetChild(0).GetComponentInChildren<ContainerPlatform>();
-            _wagonPlatforms[i] = platform;
+            var wagonTransform = Instantiate(_wagonPrefab, _wagonsTransform).transform;
+            wagonTransform.localPosition = localPosition;
+            _wagons[i] = wagonTransform.GetComponent<Wagon>();
+            
+            var platform = _wagons[i].Platform;
             platform.Placing += OnPlatformPlacing;
             platform.Placed += OnPlatformPlaced;
             platform.IsPlaceable = false;
@@ -174,7 +190,7 @@ public class Train : MonoBehaviour
 
     private IEnumerator EndMoving()
     {
-        var delta = MovingDirection * (_wagonPlatforms.Length * (WagonLength + WagonOffset));
+        var delta = MovingDirection * (_wagons.Length * (WagonLength + WagonOffset));
         
         yield return StartCoroutine(MoveTo(_trainLeavePosition + delta));
         Leaved?.Invoke(this);
@@ -194,10 +210,10 @@ public class Train : MonoBehaviour
         for (var t = 0; t < 2; t++)
         {
             startIndex = Math.Max(skipPlatforms, 0);
-            endIndex = Math.Min(skipPlatforms + _trainWindowSize, _wagonPlatforms.Length);
+            endIndex = Math.Min(skipPlatforms + _trainWindowSize, _wagons.Length);
             for (var i = startIndex; i < endIndex; i++)
             {
-                _wagonPlatforms[i].IsPlaceable = isPlaceable;
+                _wagons[i].Platform.IsPlaceable = isPlaceable;
             }
 
             if (t == 0)
@@ -208,7 +224,7 @@ public class Train : MonoBehaviour
             }
         }
         
-        if (_wagonPlatforms.Length <= skipPlatforms)
+        if (_wagons.Length <= skipPlatforms)
         {
             yield return EndMoving();
             yield break;
@@ -217,7 +233,7 @@ public class Train : MonoBehaviour
         _platformToWait = new List<ContainerPlatform>(endIndex - startIndex);
         for (var i = 0; i < _platformToWait.Capacity; i++)
         {
-            _platformToWait.Add(_wagonPlatforms[startIndex + i]);
+            _platformToWait.Add(_wagons[startIndex + i].Platform);
         }
 
         var position = _trainLoadPosition + MovingDirection * (skipPlatforms * (WagonLength + WagonOffset));
