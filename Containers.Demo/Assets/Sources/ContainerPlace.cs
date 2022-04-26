@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Sources
 {
@@ -37,10 +38,26 @@ namespace Sources
             }
         }
 
+        public IEnumerable<ContainerColumn> GetColumns()
+        {
+            if (IsEmpty() || CheckContainerType(ContainerType.Small))
+            {
+                yield return _firstColumn;
+                yield return _secondColumn;
+            }
+            else
+            {
+                yield return _firstColumn;
+            }
+        }
+
         public bool IsEmpty()
         {
             return _firstColumn.Height == 0 && _secondColumn.Height == 0;
         }
+
+        public bool CanTake(ContainerData container) =>
+            _firstColumn.CanTake(container) || _secondColumn.CanTake(container);
 
         public bool TryTake(ContainerData container)
         {

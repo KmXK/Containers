@@ -1,4 +1,4 @@
 ﻿public enum ContainerState
 {
-    Default, Loading, Preloading, Blocking, ProblemLoading
+    Default, Loading, Preloading, Blocking
 }

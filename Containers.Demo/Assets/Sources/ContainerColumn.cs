@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Sources
 {
-    public class ContainerColumn
+    public class ContainerColumn : IEnumerable<ContainerData>
     {
         private readonly int _maxHeight;
         private readonly Stack<ContainerData> _containers;
@@ -25,6 +26,14 @@ namespace Sources
 
             container.Column = this;
             _containers.Push(container);
+        }
+
+        internal bool CanTake(ContainerData container)
+        {
+            if (!_containers.Any())
+                return false;
+
+            return _containers.Peek() == container;
         }
 
         internal bool TryTake(ContainerData container)
@@ -65,6 +74,20 @@ namespace Sources
                 return false;
 
             return true;
+        }
+
+        public IEnumerator<ContainerData> GetEnumerator()
+        {
+            var array = _containers.ToArray();
+            for (var i = _containers.Count - 1; i >= 0; i--)
+            {
+                yield return array[i];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

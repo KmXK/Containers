@@ -19,6 +19,7 @@ public class ContainerBuilder : MonoBehaviour
         container.Data.Id = _nextContainerId++;
         container.Data.Type = type;
         container.Data.Company = "Test Company";
+        container.Data.Container = container;
 
         return container;
     }

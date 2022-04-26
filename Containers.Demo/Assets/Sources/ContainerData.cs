@@ -9,6 +9,8 @@ namespace Sources
         public int Id;
         public string Company;
         public string SenderCountry;
+        
         public ContainerColumn Column;
+        public Container Container;
     }
 }

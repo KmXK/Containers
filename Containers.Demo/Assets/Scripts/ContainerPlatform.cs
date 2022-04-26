@@ -1,7 +1,6 @@
 using System;
 using Sources;
 using UnityEngine;
-using UnityEngine.Events;
 
 public class ContainerPlatform : MonoBehaviour
 {
@@ -38,6 +37,8 @@ public class ContainerPlatform : MonoBehaviour
     {
         return _isPlaceable && _place.CheckContainerType(type);
     }
+
+    public bool CanTake(Container container) => _place.CanTake(container.Data);
 
     public bool CanPlace(Container container)
     {
@@ -90,13 +91,13 @@ public class ContainerPlatform : MonoBehaviour
         if (!_isTakeable)
             return false;
         
-        var isTaken = _place.TryTake(container.Data);
-        if (isTaken && _place.IsEmpty())
+        var hasTaken = _place.TryTake(container.Data);
+        if (hasTaken && _place.IsEmpty())
         {
             Emptied?.Invoke(this);
         }
 
-        return isTaken;
+        return hasTaken;
     }
 
     private void MoveContainer(Container container)

@@ -13,6 +13,8 @@ public class Train : MonoBehaviour
     
     [SerializeField] private AnimationCurve _movingCurve;
     
+    private StateManager _stateManager;
+    
     private const float VanLength = 6f;
     private const float VanOffset = 0.2f;
     
@@ -27,6 +29,9 @@ public class Train : MonoBehaviour
 
     private Vector3 _trainLoadPosition;
     private Vector3 _trainLeavePosition;
+
+    private List<Container> _currentWindowContainers;
+    private List<Container> _nextContainers;
 
     private Dictionary<ContainerPlatform, List<Container>> _platformContainers;
     private Vector3 MovingDirection => (_trainLeavePosition - _trainLoadPosition).normalized;
@@ -72,9 +77,25 @@ public class Train : MonoBehaviour
         StartCoroutine(MoveWindow());
     }
 
+    public ContainerState GetContainerState(Container container)
+    {
+        if (_currentWindowContainers.Contains(container))
+        {
+            return ContainerState.Loading;
+        }
+        if (_nextContainers.Contains(container))
+        {
+            return ContainerState.Preloading;
+        }
+
+        return ContainerState.Default;
+    }
+
     private void Awake()
     {
         _vanTransforms = transform.GetChild(0);
+
+        _stateManager = FindObjectOfType<StateManager>();
     }
     
     private void GenerateList(List<Container> largeContainers, List<Container> smallContainers)
@@ -84,6 +105,9 @@ public class Train : MonoBehaviour
             (1, largeContainers, ContainerType.Large),
             (2, smallContainers, ContainerType.Small)
         };
+
+        _currentWindowContainers = new List<Container>();
+        _nextContainers = new List<Container>();
 
         foreach (var van in _vans)
         {
@@ -100,6 +124,8 @@ public class Train : MonoBehaviour
                 var container = list[Random.Range(0, list.Count)];
                 list.Remove(container);
                 _platformContainers[platform].Add(container);
+                
+                _nextContainers.Add(container);
             }
 
             if (listData.Type == ContainerType.Large)
@@ -183,6 +209,9 @@ public class Train : MonoBehaviour
     {
         if (_platformToWait.Contains(platform))
         {
+            container.SetState(ContainerState.Default);
+            _currentWindowContainers.Remove(container);
+            
             _platformContainers[platform].Remove(container);
             if (!_platformContainers[platform].Any())
             {
@@ -220,8 +249,11 @@ public class Train : MonoBehaviour
     {
         var delta = MovingDirection * (_vans.Length * (VanLength + VanOffset));
         
+        _stateManager.CalculateStates();
+        
         yield return StartCoroutine(MoveTo(_trainLeavePosition + delta));
         Leaved?.Invoke(this);
+        Destroy(gameObject);
     }
     
     private IEnumerator MoveWindow()
@@ -258,11 +290,22 @@ public class Train : MonoBehaviour
             yield break;
         }
 
+        _currentWindowContainers.Clear();
+        
         _platformToWait = new List<ContainerPlatform>(endIndex - startIndex);
         for (var i = 0; i < _platformToWait.Capacity; i++)
         {
-            _platformToWait.Add(_vans[startIndex + i].Platform);
+            var platform = _vans[startIndex + i].Platform;
+            _platformToWait.Add(platform);
+
+            foreach (var container in _platformContainers[platform])
+            {
+                _currentWindowContainers.Add(container);
+                _nextContainers.Remove(container);
+            }
         }
+        
+        _stateManager.CalculateStates();
 
         var position = _trainLoadPosition + MovingDirection * (skipPlatforms * (VanLength + VanOffset));
         yield return MoveTo(position);

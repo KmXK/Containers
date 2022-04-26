@@ -3,7 +3,7 @@ using UnityEngine;
 public class ContainerSelector : MonoBehaviour
 {
     private Container _selectedContainer;
-
+    
     public static ContainerSelector Instance { get; private set; }
     
     void Awake()
@@ -53,18 +53,21 @@ public class ContainerSelector : MonoBehaviour
             return;
         }
 
-        if (!platform.CanPlace(_selectedContainer))
-        {
-            DeselectContainer();
-            return;
-        }
-        
         if (_selectedContainer.Platform != null && !_selectedContainer.Platform.TryRemove(_selectedContainer))
         {
             DeselectContainer();
             return;
         }
 
+        if (!platform.CanPlace(_selectedContainer))
+        {
+            DeselectContainer();
+            return;
+        }
+
+        if (_selectedContainer.Platform != null)
+            _selectedContainer.Platform.TryRemove(_selectedContainer);
+        
         platform.Place(_selectedContainer);
 
         DeselectContainer();

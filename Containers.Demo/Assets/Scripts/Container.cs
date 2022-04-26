@@ -63,6 +63,8 @@ public class Container : MonoBehaviour
 
     private void Awake()
     {
+        _data.Container = this;
+        
         VisualTransform = transform.GetChild(0);
         _material = VisualTransform.GetComponent<Renderer>().material;
         _text = GetComponentsInChildren<TextMeshPro>();
