@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class Wagon : MonoBehaviour
+public class Van : MonoBehaviour
 {
     [SerializeField] private ContainerPlatform _platform;
     

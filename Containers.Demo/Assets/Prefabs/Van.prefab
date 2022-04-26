@@ -811,7 +811,7 @@ GameObject:
   - component: {fileID: 5005708884121975431}
   - component: {fileID: 5113465841240511217}
   m_Layer: 0
-  m_Name: Wagon
+  m_Name: Van
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

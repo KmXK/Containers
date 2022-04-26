@@ -8,17 +8,17 @@ using Random = UnityEngine.Random;
 
 public class Train : MonoBehaviour
 {
-    [SerializeField] private GameObject _wagonPrefab;
-    [SerializeField] private GameObject _headWagonPrefab;
+    [SerializeField] private GameObject _vanPrefab;
+    [SerializeField] private GameObject _headVanPrefab;
     
     [SerializeField] private AnimationCurve _movingCurve;
     
-    private const float WagonLength = 6f;
-    private const float WagonOffset = 0.2f;
+    private const float VanLength = 6f;
+    private const float VanOffset = 0.2f;
     
-    private Transform _wagonsTransform;
+    private Transform _vanTransforms;
     private float _animationTime;
-    private Wagon[] _wagons;
+    private Van[] _vans;
     private List<ContainerPlatform> _platformToWait;
 
     private int _trainWindowSize;
@@ -46,20 +46,21 @@ public class Train : MonoBehaviour
                 largeContainers.Add(container);
         }
 
-        var wagonsCount = largeContainers.Count + smallContainers.Count / 2;
-        wagonsCount = Math.Clamp(wagonsCount, minWagons, maxWagons);
-        _wagons = new Wagon[wagonsCount];
-        _platformContainers = new Dictionary<ContainerPlatform, List<Container>>(wagonsCount);
-
-        if (wagonsCount < minWagons)
-            return false;
+        var vansCount = largeContainers.Count + smallContainers.Count / 2;
         
-        GenerateWagons(wagonsCount);
+        if (vansCount < minWagons)
+            return false;
+
+        vansCount = Math.Clamp(vansCount, minWagons, maxWagons);
+        
+        _vans = new Van[vansCount];
+        _platformContainers = new Dictionary<ContainerPlatform, List<Container>>(vansCount);
+
+        GenerateWagons(vansCount);
         GenerateList(largeContainers, smallContainers);
 
         return true;
     }
-
 
     public void MoveToLoading(Transform trainLoadPosition, Transform trainLeavePosition, int trainWindow)
     {
@@ -73,7 +74,7 @@ public class Train : MonoBehaviour
 
     private void Awake()
     {
-        _wagonsTransform = transform.GetChild(0);
+        _vanTransforms = transform.GetChild(0);
     }
     
     private void GenerateList(List<Container> largeContainers, List<Container> smallContainers)
@@ -84,9 +85,9 @@ public class Train : MonoBehaviour
             (2, smallContainers, ContainerType.Small)
         };
 
-        foreach (var wagon in _wagons)
+        foreach (var van in _vans)
         {
-            var platform = wagon.Platform; 
+            var platform = van.Platform; 
             
             _platformContainers.Add(platform, new List<Container>());
             
@@ -103,11 +104,11 @@ public class Train : MonoBehaviour
 
             if (listData.Type == ContainerType.Large)
             {
-                wagon.SetLargeText(_platformContainers[platform].First().Data.Id.ToString());
+                van.SetLargeText(_platformContainers[platform].First().Data.Id.ToString());
             }
             else
             {
-                wagon.SetSmallTexts(_platformContainers[platform].Select(c => c.Data.Id.ToString()).ToArray());
+                van.SetSmallTexts(_platformContainers[platform].Select(c => c.Data.Id.ToString()).ToArray());
             }
 
             if (listData.List.Count == 0)
@@ -132,19 +133,19 @@ public class Train : MonoBehaviour
     
     private void GenerateWagons(int count)
     {
-        var localPosition = new Vector3(WagonLength + WagonOffset, 0, 0);
+        var localPosition = new Vector3(VanLength + VanOffset, 0, 0);
 
-        Instantiate(_headWagonPrefab, _wagonsTransform).transform.localPosition = localPosition;
+        Instantiate(_headVanPrefab, _vanTransforms).transform.localPosition = localPosition;
         
         for (var i = 0; i < count; i++)
         {
-            localPosition.x -= WagonLength + WagonOffset;
+            localPosition.x -= VanLength + VanOffset;
 
-            var wagonTransform = Instantiate(_wagonPrefab, _wagonsTransform).transform;
-            wagonTransform.localPosition = localPosition;
-            _wagons[i] = wagonTransform.GetComponent<Wagon>();
+            var vanTransform = Instantiate(_vanPrefab, _vanTransforms).transform;
+            vanTransform.localPosition = localPosition;
+            _vans[i] = vanTransform.GetComponent<Van>();
             
-            var platform = _wagons[i].Platform;
+            var platform = _vans[i].Platform;
             platform.Placing += OnPlatformPlacing;
             platform.Placed += OnPlatformPlaced;
             platform.IsPlaceable = false;
@@ -190,7 +191,7 @@ public class Train : MonoBehaviour
 
     private IEnumerator EndMoving()
     {
-        var delta = MovingDirection * (_wagons.Length * (WagonLength + WagonOffset));
+        var delta = MovingDirection * (_vans.Length * (VanLength + VanOffset));
         
         yield return StartCoroutine(MoveTo(_trainLeavePosition + delta));
         Leaved?.Invoke(this);
@@ -210,10 +211,10 @@ public class Train : MonoBehaviour
         for (var t = 0; t < 2; t++)
         {
             startIndex = Math.Max(skipPlatforms, 0);
-            endIndex = Math.Min(skipPlatforms + _trainWindowSize, _wagons.Length);
+            endIndex = Math.Min(skipPlatforms + _trainWindowSize, _vans.Length);
             for (var i = startIndex; i < endIndex; i++)
             {
-                _wagons[i].Platform.IsPlaceable = isPlaceable;
+                _vans[i].Platform.IsPlaceable = isPlaceable;
             }
 
             if (t == 0)
@@ -224,7 +225,7 @@ public class Train : MonoBehaviour
             }
         }
         
-        if (_wagons.Length <= skipPlatforms)
+        if (_vans.Length <= skipPlatforms)
         {
             yield return EndMoving();
             yield break;
@@ -233,10 +234,10 @@ public class Train : MonoBehaviour
         _platformToWait = new List<ContainerPlatform>(endIndex - startIndex);
         for (var i = 0; i < _platformToWait.Capacity; i++)
         {
-            _platformToWait.Add(_wagons[startIndex + i].Platform);
+            _platformToWait.Add(_vans[startIndex + i].Platform);
         }
 
-        var position = _trainLoadPosition + MovingDirection * (skipPlatforms * (WagonLength + WagonOffset));
+        var position = _trainLoadPosition + MovingDirection * (skipPlatforms * (VanLength + VanOffset));
         yield return MoveTo(position);
     }
 }
