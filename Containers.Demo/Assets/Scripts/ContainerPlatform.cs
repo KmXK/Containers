@@ -1,17 +1,19 @@
 using System;
 using Sources;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class ContainerPlatform : MonoBehaviour
 {
     [Range(1, 10)]
     [SerializeField] private int _maxHeight = 5;
-
     [SerializeField] private bool _isPlaceable = true;
-    
+    [SerializeField] private bool _isTakeable = true;
+
     private ContainerPlace _place;
 
-    public event Action<ContainerPlatform> Emptied; 
+    public event Action<ContainerPlatform> Emptied;
+    public event Func<ContainerPlatform, Container, bool> Placing;
 
     private void Awake()
     {
@@ -28,8 +30,21 @@ public class ContainerPlatform : MonoBehaviour
         return _isPlaceable && _place.CheckContainerType(type);
     }
 
+    public bool CanPlace(Container container)
+    {
+        return CanPlace(container, null);
+    }
+
+    private bool CanPlace(Container container, ContainerColumn column)
+    {
+        return _place.CanPlace(container.Data, column) && Placing?.Invoke(this, container) != false;
+    }
+
     public void Place(Container container)
     {
+        if (!CanPlace(container))
+            return;
+        
         _place.Place(container.Data);
         container.Platform = this;
         MoveContainer(container);
@@ -37,6 +52,9 @@ public class ContainerPlatform : MonoBehaviour
 
     public void PlaceOn(Container containerToPlace, Container originContainer)
     {
+        if (!CanPlace(containerToPlace, originContainer.Data.Column))
+            return;
+        
         _place.Place(containerToPlace.Data, originContainer.Data.Column);
         containerToPlace.Platform = this;
         MoveContainer(containerToPlace);
@@ -44,6 +62,9 @@ public class ContainerPlatform : MonoBehaviour
 
     public bool TryRemove(Container container)
     {
+        if (!_isTakeable)
+            return false;
+        
         var isTaken = _place.TryTake(container.Data);
         if (isTaken && _place.IsEmpty())
         {

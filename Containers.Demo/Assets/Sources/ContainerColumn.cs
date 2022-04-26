@@ -20,11 +20,8 @@ namespace Sources
 
         internal void Place(ContainerData container)
         {
-            if (!CheckContainerType(container.Type))
-                throw new ArgumentException("Invalid container type!");
-
-            if (_containers.Count == _maxHeight)
-                throw new InvalidOperationException("No space to place!");
+            if (!CanPlace(container))
+                return;
 
             container.Column = this;
             _containers.Push(container);
@@ -56,6 +53,17 @@ namespace Sources
         {
             if (_containers.Any())
                 return type == _containers.Peek().Type;
+            return true;
+        }
+
+        public bool CanPlace(ContainerData container)
+        {
+            if (!CheckContainerType(container.Type))
+                return false;
+
+            if (_containers.Count == _maxHeight)
+                return false;
+
             return true;
         }
     }

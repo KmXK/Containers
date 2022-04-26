@@ -47,13 +47,15 @@ public class EventsManager : MonoBehaviour
         if (_isTrainWaiting)
             return;
 
-        var train = Instantiate(_trainPrefab, _trainSpawnPosition.position, Quaternion.identity, _trainContainer)
+        var train = Instantiate(_trainPrefab, _trainSpawnPosition.position, _trainSpawnPosition.localRotation, _trainContainer)
             .GetComponent<Train>();
         if (!train.Generate(_minWagons, _maxWagons))
         {
             Destroy(train.gameObject);
             return;
         }
+
+        _isTrainWaiting = true;
         
         train.MoveToLoading(_trainLoadPosition, _trainLeavePosition);
         train.Leaved += _ => _isTrainWaiting = false;

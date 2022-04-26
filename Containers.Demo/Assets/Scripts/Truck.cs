@@ -15,7 +15,6 @@ public class Truck : MonoBehaviour
     public void MoveToUnloading(IEnumerable<Container> containers, Vector3 endPosition, Vector3 afterPosition)
     {
         LoadContainers(containers);
-        _animationTime = 0;
         StartCoroutine(MovingCoroutine(endPosition));
 
         _platform.Emptied += _ => StartCoroutine(Unload(afterPosition));
@@ -23,7 +22,6 @@ public class Truck : MonoBehaviour
 
     private IEnumerator Unload(Vector3 afterPosition)
     {
-        _animationTime = 0;
         yield return StartCoroutine(MovingCoroutine(afterPosition));
         Leaved?.Invoke(this);
         Destroy(gameObject);
@@ -44,6 +42,7 @@ public class Truck : MonoBehaviour
 
     private IEnumerator MovingCoroutine(Vector3 endPosition)
     {
+        _animationTime = 0;
         var startPosition = transform.position;
         var distance = endPosition - startPosition;
         
@@ -52,7 +51,7 @@ public class Truck : MonoBehaviour
             transform.position = startPosition + _movingCurve.Evaluate(_animationTime) * distance;
 
             yield return null;
-            
+
             _animationTime += Time.deltaTime;
         }
     }

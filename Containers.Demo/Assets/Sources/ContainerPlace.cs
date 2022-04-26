@@ -15,11 +15,11 @@ namespace Sources
 
         public void Place(ContainerData container, ContainerColumn column = null)
         {
-            if (!CheckContainerType(container.Type))
-                throw new ArgumentException("Invalid container type!");
-
             if (column != null && column != _firstColumn && column != _secondColumn)
                 throw new ArgumentException("Invalid column!");
+            
+            if (!CanPlace(container, column))
+                return;
 
             switch (container.Type)
             {
@@ -44,6 +44,20 @@ namespace Sources
             return _firstColumn.TryTake(container) || _secondColumn.TryTake(container);
         }
 
+        public bool CanPlace(ContainerData containerData, ContainerColumn column = null)
+        {
+            var c = column;
+            if (c == null)
+            {
+                c = _firstColumn;
+                if (containerData.Type == ContainerType.Small &&
+                    _firstColumn.Height > _secondColumn.Height)
+                    c = _secondColumn;
+            }
+            
+            return c.CanPlace(containerData);
+        }
+        
         public bool CheckContainerType(ContainerType type)
         {
             return _firstColumn.CheckContainerType(type) && _secondColumn.CheckContainerType(type);

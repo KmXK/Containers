@@ -52,6 +52,12 @@ public class ContainerSelector : MonoBehaviour
             DeselectContainer();
             return;
         }
+
+        if (!platform.CanPlace(_selectedContainer))
+        {
+            DeselectContainer();
+            return;
+        }
         
         if (_selectedContainer.Platform != null && !_selectedContainer.Platform.TryRemove(_selectedContainer))
         {
