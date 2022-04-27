@@ -36,6 +36,11 @@ public class ContainersGenerator : MonoBehaviour
                     platform.Place(container);
                     break;
                 }
+
+                if (j == 3)
+                {
+                    Destroy(container.gameObject);
+                }
             }
         }
     }
