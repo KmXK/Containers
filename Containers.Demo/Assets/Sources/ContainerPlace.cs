@@ -86,7 +86,7 @@ namespace Sources
                 return (1, _secondColumn.Height);
         }
         
-        private bool CheckContainerType(ContainerType type)
+        public bool CheckContainerType(ContainerType type)
         {
             return _firstColumn.CheckContainerType(type) && _secondColumn.CheckContainerType(type);
         }

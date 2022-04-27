@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Sources;
 using UnityEngine;
-using Random = UnityEngine.Random;
+using Random = System.Random;
 
 public class Train : MonoBehaviour
 {
+    [SerializeField] private int _randomSeed;
+    
     [SerializeField] private GameObject _vanPrefab;
     [SerializeField] private GameObject _headVanPrefab;
     
@@ -109,19 +111,21 @@ public class Train : MonoBehaviour
         _currentWindowContainers = new List<Container>();
         _nextContainers = new List<Container>();
 
+        var random = new Random(_randomSeed);
+
         foreach (var van in _vans)
         {
             var platform = van.Platform; 
             
             _platformContainers.Add(platform, new List<Container>());
             
-            var listData = lists[Random.Range(0, lists.Count)];
+            var listData = lists[random.Next(0, lists.Count)];
             var list = listData.List;
             var containersCountToTake = listData.Count;
 
             for (var j = 0; j < containersCountToTake; j++)
             {
-                var container = list[Random.Range(0, list.Count)];
+                var container = list[random.Next(0, list.Count)];
                 list.Remove(container);
                 _platformContainers[platform].Add(container);
                 
@@ -148,9 +152,17 @@ public class Train : MonoBehaviour
     {
         if (!_platformContainers.ContainsKey(platform))
             return true;
+        
+        if (container.Platform != null && !container.Platform.CanTake(container))
+        {
+            return false;
+        }
 
         if (_platformContainers[platform].Contains(container))
         {
+            if (container.Platform != null)
+                container.Platform.TryRemove(container);
+            
             var containers = _platformContainers[platform];
 
             platform.Placing -= OnPlatformPlacing;

@@ -1,16 +1,21 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class StateManager : MonoBehaviour
 {
     [SerializeField] private Transform _trainsContainer;
     [SerializeField] private Transform _platformsContainer;
+
+    public List<ColumnData> ColumnsData;
     
     public void CalculateStates()
     {
         var train = _trainsContainer.GetComponentInChildren<Train>();
         if (train == null)
             return;
+
+        ColumnsData.Clear();
         
         var platforms = _platformsContainer.GetComponentsInChildren<ContainerPlatform>();
 
@@ -22,6 +27,9 @@ public class StateManager : MonoBehaviour
 
             foreach (var column in place.GetColumns())
             {
+                var loadingDepth = -1;
+                var i = 0;
+                
                 var defaultState = ContainerState.Default;
                 foreach (var containerData in column)
                 {
@@ -35,10 +43,24 @@ public class StateManager : MonoBehaviour
                     else
                     {
                         defaultState = ContainerState.Blocking;
+
+                        if (state == ContainerState.Loading)
+                        {
+                            loadingDepth = i;
+                        }
                     }
                     
                     container.SetState(state);
+
+                    i++;
                 }
+                
+                ColumnsData.Add(new ColumnData
+                {
+                    Platform =  platform,
+                    Column = column,
+                    MinLoadingDepth = loadingDepth
+                });
             }
         }
     }
@@ -57,5 +79,7 @@ public class StateManager : MonoBehaviour
         {
             platform.Placed += (_, _) => CalculateStates();
         }
+
+        ColumnsData = new List<ColumnData>();
     }
 }

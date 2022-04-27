@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class ContainerSelector : MonoBehaviour
 {
+    [SerializeField] private PlaceAlgorithm _placeAlgorithm;
+    
     private Container _selectedContainer;
     
     public static ContainerSelector Instance { get; private set; }
@@ -42,6 +44,7 @@ public class ContainerSelector : MonoBehaviour
         else
         {
             SelectContainer(container);
+            _placeAlgorithm.ShowBestMove(container);
         }
     }
 
@@ -82,6 +85,7 @@ public class ContainerSelector : MonoBehaviour
     {
         if(_selectedContainer != null)
         {
+            _placeAlgorithm.ClearShadow();
             _selectedContainer.Deselect();
             _selectedContainer = null;
         }

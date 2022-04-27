@@ -33,7 +33,7 @@ public class ContainerPlatform : MonoBehaviour
         ContainerSelector.Instance.PlatformClick(this);
     }
 
-    public bool CanTake(Container container) => _place.CanTake(container.Data);
+    public bool CanTake(Container container) => _isTakeable && _place.CanTake(container.Data);
 
     public bool CanPlace(Container container) => CanPlace(container, null);
 
@@ -80,7 +80,7 @@ public class ContainerPlatform : MonoBehaviour
 
     public bool TryRemove(Container container)
     {
-        if (!_isTakeable)
+        if (!CanTake(container))
             return false;
         
         var hasTaken = _place.TryTake(container.Data);
@@ -94,21 +94,27 @@ public class ContainerPlatform : MonoBehaviour
 
     private void MoveContainer(Container container)
     {
-        var containerVisualTransform = container.VisualTransform;
         container.transform.SetParent(transform);
+        
+        container.transform.localPosition = GetContainerPosition(container, container.Data.Column, true);
+    }
 
-        var (column, height) = _place.GetColumnInfo(container.Data.Column);
-
+    public Vector3 GetContainerPosition(Container container, ContainerColumn column, bool containerInColumn)
+    {
+        var (columnIndex, height) = _place.GetColumnInfo(column);   
+        var containerVisualTransform = container.VisualTransform;
         var containerScale = containerVisualTransform.localScale;
-        var y = (height - 1) * containerScale.y;
+
+        var h = containerInColumn ? height - 1 : height;
+        var y = h * containerScale.y;
 
         var x = container.Data.Type switch
         {
-            ContainerType.Small => (column * 2 - 1) * (11 * containerScale.x / 20),
+            ContainerType.Small => (columnIndex * 2 - 1) * (11 * containerScale.x / 20),
             ContainerType.Large => 0,
             _ => throw new ArgumentOutOfRangeException()
         };
 
-        container.transform.localPosition = new Vector2(x, y);
+        return new Vector2(x, y);
     }
 }

@@ -236,6 +236,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6d7eb94b2583ed46b90c73ae5e47876, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _placeAlgorithm: {fileID: 554362720}
 --- !u!4 &35585981
 Transform:
   m_ObjectHideFlags: 0
@@ -850,7 +851,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07a203be4d759414eacb3145bccc84c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _unfocusedContainerAlpha: 0.3
+  _unfocusedContainerAlpha: 0.117
   _materialGroups:
   - State: 0
     StandardColor: {r: 0.6226415, g: 0.6226415, b: 0.6226415, a: 1}
@@ -1282,6 +1283,53 @@ MonoBehaviour:
   _containersParent: {fileID: 1751056171}
   _smallContainerPrefab: {fileID: 3123110505995178034, guid: 68ab8affc3dc9974ca2c983f53b84f82, type: 3}
   _largeContainerPrefab: {fileID: 3123110505995178034, guid: 62a977e6eb347d84ab24226da0c67e35, type: 3}
+--- !u!1 &554362718
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 554362719}
+  - component: {fileID: 554362720}
+  m_Layer: 0
+  m_Name: PlaceAlgorithm
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &554362719
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 554362718}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1635634976}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &554362720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 554362718}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fa3f21cd22f4f208467978bab284d52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stateManager: {fileID: 1452983617}
+  _containerSelector: {fileID: 35585980}
+  _containerShadow: {fileID: 2914230025196354960, guid: d961f32bb17ba95438fb4e7661d83fa4, type: 3}
 --- !u!1 &571914883
 GameObject:
   m_ObjectHideFlags: 0
@@ -2869,6 +2917,7 @@ Transform:
   - {fileID: 571914884}
   - {fileID: 1452983616}
   - {fileID: 1314291383}
+  - {fileID: 554362719}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
