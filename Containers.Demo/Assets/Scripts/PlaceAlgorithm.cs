@@ -10,8 +10,11 @@ public class PlaceAlgorithm : MonoBehaviour
     [SerializeField] private Transform _trainsContainer;
     
     [SerializeField] private GameObject _containerShadow;
+    [SerializeField] private GameObject _linePrefab;
 
     private GameObject _shadow;
+    private GameObject _line;
+    
     private (ContainerPlatform Platform, ContainerColumn Column)? _bestMove;
 
     public void PerformAlgorithm()
@@ -62,6 +65,20 @@ public class PlaceAlgorithm : MonoBehaviour
         
         st.localScale = container.VisualTransform.localScale;
         st.localPosition = _bestMove.Value.Platform.GetContainerPosition(container, _bestMove.Value.Column, false);
+
+        _line = Instantiate(_linePrefab, transform);
+        var p1 = container.transform.position + Vector3.up * .5f;
+        var p2 = st.position + Vector3.up * .5f;
+
+        var line = _line.GetComponent<LineRenderer>();
+        line.positionCount = 4;
+        line.SetPositions(new []
+        {
+            p1,
+            p1 + Vector3.up * 10,
+            p2 + Vector3.up * 10,
+            p2
+        });
     }
 
     public void ClearShadow()
@@ -69,6 +86,7 @@ public class PlaceAlgorithm : MonoBehaviour
         if(_shadow != null)
         {
             Destroy(_shadow);
+            Destroy(_line);
             _shadow = null;
             _bestMove = null;
         }
