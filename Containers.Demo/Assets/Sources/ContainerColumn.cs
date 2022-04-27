@@ -58,6 +58,8 @@ namespace Sources
             return _containers.Pop();
         }
 
+        public ContainerData Top() => _containers.Peek();
+
         internal bool CheckContainerType(ContainerType type)
         {
             if (_containers.Any())

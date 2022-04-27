@@ -1329,6 +1329,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _stateManager: {fileID: 1452983617}
   _containerSelector: {fileID: 35585980}
+  _trainsContainer: {fileID: 911562967}
   _containerShadow: {fileID: 2914230025196354960, guid: d961f32bb17ba95438fb4e7661d83fa4, type: 3}
 --- !u!1 &571914883
 GameObject:

@@ -14,6 +14,9 @@ public class Container : MonoBehaviour
 
     private ContainerMaterialGroup MaterialGroup => ColorManager.Instance.MaterialGroups[_state];
     
+    public int WindowIndex { get; set; }
+    public ContainerState State => _state;
+    
     public Transform VisualTransform { get; private set; }
     public ContainerData Data => _data;
     public ContainerPlatform Platform { get; set; }

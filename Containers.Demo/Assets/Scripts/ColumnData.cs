@@ -1,6 +1,6 @@
 ﻿using Sources;
 
-public struct ColumnData
+public class ColumnData
 {
     public ContainerPlatform Platform;
     public ContainerColumn Column;

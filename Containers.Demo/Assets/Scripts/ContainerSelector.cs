@@ -20,7 +20,13 @@ public class ContainerSelector : MonoBehaviour
 
     public void ContainerClick(Container container)
     {
-        if (_selectedContainer != null && _selectedContainer != container && container.Platform != null)
+        if (_selectedContainer == container)
+        {
+            DeselectContainer();
+            return;
+        }
+        
+        if (_selectedContainer != null && container.Platform != null)
         {
             if (!container.Data.Column.CanPlace(_selectedContainer.Data))
             {

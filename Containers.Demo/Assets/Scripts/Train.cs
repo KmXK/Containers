@@ -25,7 +25,7 @@ public class Train : MonoBehaviour
     private Van[] _vans;
     private List<ContainerPlatform> _platformToWait;
 
-    private int _trainWindowSize;
+    private int _windowSize;
     private int _currentWindowIndex;
     private bool _isMoving;
 
@@ -37,7 +37,7 @@ public class Train : MonoBehaviour
 
     private Dictionary<ContainerPlatform, List<Container>> _platformContainers;
     private Vector3 MovingDirection => (_trainLeavePosition - _trainLoadPosition).normalized;
-
+    
     public event Action<Train> Leaved;
 
     public bool Generate(int minWagons, int maxWagons)
@@ -74,7 +74,7 @@ public class Train : MonoBehaviour
         _trainLoadPosition = trainLoadPosition.position;
         _trainLeavePosition = trainLeavePosition.position;
         
-        _trainWindowSize = trainWindow;
+        _windowSize = trainWindow;
         _currentWindowIndex = -1;
         StartCoroutine(MoveWindow());
     }
@@ -113,6 +113,9 @@ public class Train : MonoBehaviour
 
         var random = new Random(_randomSeed);
 
+        var windowIndex = 0;
+        var i = 0;
+
         foreach (var van in _vans)
         {
             var platform = van.Platform; 
@@ -126,6 +129,7 @@ public class Train : MonoBehaviour
             for (var j = 0; j < containersCountToTake; j++)
             {
                 var container = list[random.Next(0, list.Count)];
+                container.WindowIndex = windowIndex;
                 list.Remove(container);
                 _platformContainers[platform].Add(container);
                 
@@ -144,6 +148,12 @@ public class Train : MonoBehaviour
             if (listData.List.Count == 0)
             {
                 lists.Remove(listData);
+            }
+
+            if (++i == _windowSize)
+            {
+                i = 0;
+                windowIndex++;
             }
         }
     }
@@ -176,13 +186,8 @@ public class Train : MonoBehaviour
             }
             else
             {
-                var column = platform.ContainerPlace.FirstColumn;
-                var index = 0;
-                if (containers[0] != container)
-                {
-                    column = platform.ContainerPlace.SecondColumn;
-                    index = 1;
-                }
+                var column = GetColumn(platform, container);
+                var index = column == platform.ContainerPlace.FirstColumn ? 0 : 1;
 
                 van.DisableSmallText(index);
                 platform.Place(container, column);
@@ -194,6 +199,41 @@ public class Train : MonoBehaviour
         }
 
         return false;
+    }
+
+    private ContainerColumn GetColumn(ContainerPlatform platform, Container container)
+    {
+        var containers = _platformContainers[platform];
+        
+        var van = _vans.FirstOrDefault(v => v.Platform == platform);
+        if (van == null)
+            return null;
+            
+        if (containers.Count == 1)
+        {
+            return platform.ContainerPlace.FirstColumn.Height == 0
+                ? platform.ContainerPlace.FirstColumn
+                : platform.ContainerPlace.SecondColumn;
+        }
+
+        var column = platform.ContainerPlace.FirstColumn;
+        if (containers[0] != container)
+        {
+            column = platform.ContainerPlace.SecondColumn;
+        }
+
+        return column;
+    }
+
+    public (ContainerPlatform, ContainerColumn)? GetColumn(Container container)
+    {
+        var platform = _platformContainers
+            .FirstOrDefault(p => p.Value.Contains(container))
+            .Key;
+        if (platform == null)
+            return null;
+
+        return (platform, GetColumn(platform, container));
     }
     
     private void GenerateWagons(int count)
@@ -275,14 +315,14 @@ public class Train : MonoBehaviour
             yield return null;
         }
         
-        var skipPlatforms = _currentWindowIndex * _trainWindowSize;
+        var skipPlatforms = _currentWindowIndex * _windowSize;
 
         var isPlaceable = false;
         int startIndex = 0, endIndex = 0; 
         for (var t = 0; t < 2; t++)
         {
             startIndex = Math.Max(skipPlatforms, 0);
-            endIndex = Math.Min(skipPlatforms + _trainWindowSize, _vans.Length);
+            endIndex = Math.Min(skipPlatforms + _windowSize, _vans.Length);
             for (var i = startIndex; i < endIndex; i++)
             {
                 _vans[i].Platform.IsPlaceable = isPlaceable;
@@ -292,7 +332,7 @@ public class Train : MonoBehaviour
             {
                 _currentWindowIndex++;
                 isPlaceable = true;
-                skipPlatforms += _trainWindowSize;
+                skipPlatforms += _windowSize;
             }
         }
         
