@@ -5,6 +5,8 @@ public class ContainerSelector : MonoBehaviour
     [SerializeField] private PlaceAlgorithm _placeAlgorithm;
     
     private Container _selectedContainer;
+
+    public Container SelectedContainer => _selectedContainer;
     
     public static ContainerSelector Instance { get; private set; }
     

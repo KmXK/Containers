@@ -12,6 +12,7 @@ public class Train : MonoBehaviour
     
     [SerializeField] private GameObject _vanPrefab;
     [SerializeField] private GameObject _headVanPrefab;
+    [SerializeField] private GameObject _barierPrefab;
     
     [SerializeField] private AnimationCurve _movingCurve;
     
@@ -34,9 +35,12 @@ public class Train : MonoBehaviour
 
     private List<Container> _currentWindowContainers;
     private List<Container> _nextContainers;
+    
+    private GameObject _barier1, _barier2;
 
     private Dictionary<ContainerPlatform, List<Container>> _platformContainers;
     private Vector3 MovingDirection => (_trainLeavePosition - _trainLoadPosition).normalized;
+
     
     public event Action<Train> Leaved;
 
@@ -98,15 +102,19 @@ public class Train : MonoBehaviour
         _vanTransforms = transform.GetChild(0);
 
         _stateManager = FindObjectOfType<StateManager>();
+
+        _barier1 = Instantiate(_barierPrefab, transform);
+        _barier2 = Instantiate(_barierPrefab, transform);
     }
     
     private void GenerateList(List<Container> largeContainers, List<Container> smallContainers)
     {
-        var lists = new List<(int Count, List<Container> List, ContainerType Type)>
-        {
-            (1, largeContainers, ContainerType.Large),
-            (2, smallContainers, ContainerType.Small)
-        };
+        var lists = new List<(int Count, List<Container> List, ContainerType Type)>();
+        if(largeContainers.Any()) lists.Add((1, largeContainers, ContainerType.Large));
+        if(smallContainers.Any()) lists.Add((2, smallContainers, ContainerType.Small));
+
+        if (!lists.Any())
+            return;
 
         _currentWindowContainers = new List<Container>();
         _nextContainers = new List<Container>();
@@ -310,6 +318,9 @@ public class Train : MonoBehaviour
     
     private IEnumerator MoveWindow()
     {
+        _barier1.SetActive(false);
+        _barier2.SetActive(false);
+        
         while (_isMoving)
         {
             yield return null;
@@ -360,6 +371,13 @@ public class Train : MonoBehaviour
         _stateManager.CalculateStates();
 
         var position = _trainLoadPosition + MovingDirection * (skipPlatforms * (VanLength + VanOffset));
+        
+        _barier1.SetActive(true);
+        _barier2.SetActive(true);
+
+        _barier1.transform.localPosition = Vector3.right * ((VanLength + VanOffset - 0.1f) / 2 - startIndex * (VanLength + VanOffset));
+        _barier2.transform.localPosition = Vector3.left * ((VanLength + VanOffset) / 2 + (endIndex - 1) * (VanLength + VanOffset));
+        
         yield return MoveTo(position);
     }
 }

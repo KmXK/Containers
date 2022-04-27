@@ -1,9 +1,12 @@
 using System;
 using Sources;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class ContainerPlatform : MonoBehaviour
+public class ContainerPlatform : MonoBehaviour, IPointerClickHandler
 {
+    [SerializeField] private StateManager _stateManager;
+    
     [Range(1, 10)]
     [SerializeField] private int _maxHeight = 5;
     [SerializeField] private bool _isPlaceable = true;
@@ -28,7 +31,12 @@ public class ContainerPlatform : MonoBehaviour
         _place = new ContainerPlace(_maxHeight);
     }
 
-    private void OnMouseUpAsButton()
+    private void Start()
+    {
+        Placed += (_, _) => FindObjectOfType<StateManager>().CalculateStates();
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
     {
         ContainerSelector.Instance.PlatformClick(this);
     }

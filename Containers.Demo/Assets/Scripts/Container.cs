@@ -1,8 +1,9 @@
 using Sources;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class Container : MonoBehaviour
+public class Container : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     [SerializeField] private ContainerData _data;
 
@@ -81,7 +82,7 @@ public class Container : MonoBehaviour
         }
     }
 
-    private void OnMouseEnter()
+    public void OnPointerEnter(PointerEventData eventData)
     {
         if(!_isSelected)
         {
@@ -89,7 +90,7 @@ public class Container : MonoBehaviour
         }
     }
 
-    private void OnMouseExit()
+    public void OnPointerExit(PointerEventData eventData)
     {
         if(!_isSelected)
         {
@@ -97,7 +98,7 @@ public class Container : MonoBehaviour
         }
     }
 
-    private void OnMouseUpAsButton()
+    public void OnPointerClick(PointerEventData eventData)
     {
         ContainerSelector.Instance.ContainerClick(this);
     }

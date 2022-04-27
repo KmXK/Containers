@@ -12,15 +12,39 @@ public class PlaceAlgorithm : MonoBehaviour
     [SerializeField] private GameObject _containerShadow;
 
     private GameObject _shadow;
+    private (ContainerPlatform Platform, ContainerColumn Column)? _bestMove;
 
-    public void SelectBestContainer()
+    public void PerformAlgorithm()
+    {
+        if (_containerSelector.SelectedContainer != null)
+        {
+            if (_bestMove != null)
+            {
+                if (_bestMove.Value.Column.Height > 0)
+                {
+                    _containerSelector.ContainerClick(_bestMove.Value.Column.Top().Container);
+                }
+                else
+                {
+                    _containerSelector.PlatformClick(_bestMove.Value.Platform);
+                }
+            }
+        }
+        
+        SelectBestContainer();
+    }
+    
+    private void SelectBestContainer()
     {
         var column = _stateManager.ColumnsData
             .Where(c => c.MinLoadingDepth >= 0)
             .OrderBy(c => c.MinLoadingDepth)
-            .First();
+            .FirstOrDefault();
 
-        _containerSelector.ContainerClick(column.Column.ToArray()[^1].Container);
+        if (column == null)
+            return;
+
+        _containerSelector.ContainerClick(column.Column.Top().Container);
     }
 
     public void ShowBestMove(Container container)
@@ -31,13 +55,13 @@ public class PlaceAlgorithm : MonoBehaviour
             return;
         }
 
-        var column = c.Value;
+        _bestMove = c.Value;
 
-        _shadow = Instantiate(_containerShadow, column.Platform.transform);
+        _shadow = Instantiate(_containerShadow, _bestMove.Value.Platform.transform);
         var st = _shadow.transform;
         
         st.localScale = container.VisualTransform.localScale;
-        st.localPosition = column.Platform.GetContainerPosition(container, column.Column, false);
+        st.localPosition = _bestMove.Value.Platform.GetContainerPosition(container, _bestMove.Value.Column, false);
     }
 
     public void ClearShadow()
@@ -46,6 +70,7 @@ public class PlaceAlgorithm : MonoBehaviour
         {
             Destroy(_shadow);
             _shadow = null;
+            _bestMove = null;
         }
     }
     
@@ -121,7 +146,7 @@ public class PlaceAlgorithm : MonoBehaviour
 
         foreach (var columnData in columns)
         {
-            if (columnData.Platform.CanPlace(container))
+            if (columnData.Platform != container.Platform && columnData.Platform.CanPlace(container))
             {
                 return (columnData.Platform, columnData.Column);
             }

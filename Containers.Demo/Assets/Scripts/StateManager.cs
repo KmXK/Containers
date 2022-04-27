@@ -22,8 +22,8 @@ public class StateManager : MonoBehaviour
         foreach (var platform in platforms)
         {
             var place = platform.ContainerPlace;
-            if (place.IsEmpty())
-                continue;
+            // if (place.IsEmpty())
+            //     continue;
 
             foreach (var column in place.GetColumns())
             {
@@ -55,6 +55,7 @@ public class StateManager : MonoBehaviour
                     i++;
                 }
                 
+                
                 ColumnsData.Add(new ColumnData
                 {
                     Platform =  platform,
@@ -75,11 +76,6 @@ public class StateManager : MonoBehaviour
 
     private void Awake()
     {
-        foreach (var platform in FindObjectsOfType<ContainerPlatform>())
-        {
-            platform.Placed += (_, _) => CalculateStates();
-        }
-
         ColumnsData = new List<ColumnData>();
     }
 }

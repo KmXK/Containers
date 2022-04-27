@@ -76,8 +76,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29a4e2ff055d4024e89d17c3e8a78a4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _randomSeed: 0
   _vanPrefab: {fileID: 5935862501024966081, guid: a7d551d7d8d73ef46ac2b3b719f07435, type: 3}
   _headVanPrefab: {fileID: 5935862501024966081, guid: ce6b6444b35ba3b4eb8da6aee9f943e4, type: 3}
+  _barierPrefab: {fileID: 5911499205730905987, guid: 2fa6ab42a4b4b754f93fe3bbd5b4f1c0, type: 3}
   _movingCurve:
     serializedVersion: 2
     m_Curve:
