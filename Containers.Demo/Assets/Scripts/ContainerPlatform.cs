@@ -45,7 +45,7 @@ public class ContainerPlatform : MonoBehaviour, IPointerClickHandler
 
     public bool CanPlace(Container container) => CanPlace(container, null);
 
-    private bool CanPlace(Container container, ContainerColumn column)
+    public bool CanPlace(Container container, ContainerColumn column)
     {
         return _place.CanPlace(container.Data, column) && Placing?.Invoke(this, container) != false;
     }

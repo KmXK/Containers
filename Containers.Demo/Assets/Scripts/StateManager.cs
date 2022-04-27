@@ -28,7 +28,7 @@ public class StateManager : MonoBehaviour
             foreach (var column in place.GetColumns())
             {
                 var loadingDepth = -1;
-                var i = 0;
+                var i = column.Height - 1;
                 
                 var defaultState = ContainerState.Default;
                 foreach (var containerData in column)
@@ -52,7 +52,7 @@ public class StateManager : MonoBehaviour
                     
                     container.SetState(state);
 
-                    i++;
+                    i--;
                 }
                 
                 

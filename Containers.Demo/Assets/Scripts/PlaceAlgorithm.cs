@@ -146,7 +146,7 @@ public class PlaceAlgorithm : MonoBehaviour
 
         foreach (var columnData in columns)
         {
-            if (columnData.Platform != container.Platform && columnData.Platform.CanPlace(container))
+            if (columnData.Platform != container.Platform && columnData.Platform.CanPlace(container, columnData.Column))
             {
                 return (columnData.Platform, columnData.Column);
             }
